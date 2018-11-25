@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Row, Col } from "reactstrap";
+import { Button, Row, Col, FormGroup, Input, Label } from "reactstrap";
 
 import "./MerryGoRound.css";
 
@@ -43,6 +43,10 @@ class MerryGoRound extends Component {
     }
   };
 
+  setParticipants = event => {
+    this.setState({ ...initialState, no_of_boxes: event.target.value });
+  };
+
   disabled = box => {
     return this.state.selected.includes(box) && box !== this.state.winning_box;
   };
@@ -50,6 +54,21 @@ class MerryGoRound extends Component {
   render() {
     return (
       <div className="MerryGoRound text-center">
+        <h1 className="display-7">Merry go Round</h1>
+        <Row>
+          <Col md="6">
+            <FormGroup>
+              <Label for="exampleEmail" className="font-weight-bold">Number of Players</Label>
+              <Input
+                type="number"
+                placeholder="Number of Players"
+                min="1"
+                onChange={this.setParticipants}
+                className="font-weight-bold"
+              />
+            </FormGroup>
+          </Col>
+        </Row>
         <Row className="controls">
           <Col md="6" className="mb-2">
             <Button
