@@ -1,28 +1,26 @@
-import React, { Component } from 'react';
-import { 
-  Container,
-  Jumbotron
-} from "reactstrap";
+import React, { Component } from "react";
+import { Switch, Route } from "react-router-dom";
+
+import { Container } from "reactstrap";
 
 import Header from "./components/ui/Header/Header";
-import group from './assets/images/group.svg';
-import './App.css';
+import Home from "./components/pages/Home/Home";
+import MerryGoRound from "./components/pages/MerryGoRound/MerryGoRound";
+import "./App.css";
 
 class App extends Component {
+  loadComponent;
+
   render() {
     return (
       <div className="App">
         <Header />
-        
+
         <Container>
-          <Jumbotron className="text-center">
-            <img src={group} height="350" alt="Chama Group" />
-            <h1 class="display-4">Welcome to Chama App</h1>
-            <p class="lead">This is a platform for Chamas</p>
-            <hr class="my-4"/>
-            <p>Want to Register and move your Chama online?</p>
-            <a className="btn btn-primary btn-lg" href="/register" role="button">Register your Chama Now!</a>
-          </Jumbotron>
+          <Switch>
+            <Route exact path="/merry-go-round" component={MerryGoRound} />
+            <Route exact path="/" component={Home} />
+          </Switch>
         </Container>
       </div>
     );

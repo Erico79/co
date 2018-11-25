@@ -1,0 +1,20 @@
+.MerryGoRound {
+    margin-top: 20px;
+}
+
+.MerryGoRound > .row.controls Button.btn-success, .MerryGoRound Button.btn-danger {
+    width: 100%;
+    height: auto;
+}
+
+.MerryGoRound Button.btn-secondary, Button.btn-success {
+    width: 50%;
+}
+
+.MerryGoRound .row.boxes {
+    line-height: 50px;
+}
+
+.MerryGoRound .row.boxes {
+    line-height: 60px;
+}
