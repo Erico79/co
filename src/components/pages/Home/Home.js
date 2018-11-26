@@ -13,10 +13,10 @@ const home = () => {
         <p className="lead">This is a platform for Chamas</p>
         <hr className="my-4" />
         <p>Want to Register and move your Chama online?</p>
-        <a className="btn btn-primary btn-lg" href="/register" role="button">
+        <a className="btn btn-primary btn-lg mr-2" href="/register" role="button">
           Register your Chama Now!
         </a>&nbsp;
-        <a className="btn btn-outline-info btn-lg" href="/register" role="button">
+        <a className="btn btn-outline-primary btn-lg" href="/register" role="button">
           Login
         </a>
       </Jumbotron>
