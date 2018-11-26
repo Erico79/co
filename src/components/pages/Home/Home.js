@@ -16,7 +16,7 @@ const home = () => {
         <a className="btn btn-primary btn-lg" href="/register" role="button">
           Register your Chama Now!
         </a>&nbsp;
-        <a className="btn btn-default btn-lg" href="/register" role="button">
+        <a className="btn btn-default btn-outline btn-lg" href="/register" role="button">
           Login
         </a>
       </Jumbotron>
