@@ -15,7 +15,7 @@ import {
   DropdownItem
 } from "reactstrap";
 
-import "./Header.css";
+import "./Header.sass";
 import logo from "../../../assets/images/logo.svg";
 
 class Header extends Component {
@@ -53,7 +53,7 @@ class Header extends Component {
           </NavbarBrand>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="ml-auto" navbar>
+            <Nav className="mr-auto" navbar>
               <NavItem>
                 <NavLink
                   onClick={() => {
@@ -72,6 +72,8 @@ class Header extends Component {
                   Merry go Round
                 </NavLink>
               </NavItem>
+            </Nav>
+            <Nav className="ml-auto" navbar>
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
                   <i className="fa fa-user text-light" />
