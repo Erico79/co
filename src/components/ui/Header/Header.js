@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
 import {
   Collapse,
@@ -101,7 +101,7 @@ class Header extends Component {
 }
 
 Header.propType = {
-  history: PropTypes.shape().required,
-}
+  history: PropTypes.shape().required
+};
 
 export default withRouter(Header);
