@@ -6,11 +6,10 @@ import { Container } from "reactstrap";
 import Header from "./components/ui/Header/Header";
 import Home from "./components/pages/Home/Home";
 import MerryGoRound from "./components/pages/MerryGoRound/MerryGoRound";
+import Registration from "./components/pages/Registration/Registration";
 import "./App.css";
 
 class App extends Component {
-  loadComponent;
-
   render() {
     return (
       <div className="App">
@@ -18,6 +17,7 @@ class App extends Component {
 
         <Container>
           <Switch>
+            <Route exact path="/register" component={Registration} />
             <Route exact path="/merry-go-round" component={MerryGoRound} />
             <Route exact path="/" component={Home} />
           </Switch>

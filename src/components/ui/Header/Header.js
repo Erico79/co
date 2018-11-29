@@ -66,6 +66,15 @@ class Header extends Component {
               <NavItem>
                 <NavLink
                   onClick={() => {
+                    history.push("/register");
+                  }}
+                >
+                  Register your Chama
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  onClick={() => {
                     history.push("/merry-go-round");
                   }}
                 >
@@ -86,7 +95,13 @@ class Header extends Component {
                   </DropdownMenu>
                 ) : (
                   <DropdownMenu right>
-                    <DropdownItem>Register</DropdownItem>
+                    <DropdownItem
+                      onClick={() => {
+                        history.push("/register");
+                      }}
+                    >
+                      Register
+                    </DropdownItem>
                     <DropdownItem divider />
                     <DropdownItem>Login</DropdownItem>
                   </DropdownMenu>

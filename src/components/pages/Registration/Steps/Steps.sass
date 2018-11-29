@@ -1,0 +1,22 @@
+.Steps
+    margin-bottom: 20px
+    .step
+        // background-color: #fa5e5b
+        // border: 1px solid #343a40
+        box-sizing: border-box
+        width: 150px
+        padding: 20px
+        cursor: pointer
+        display: inline-block
+        @media only screen and (max-width: 526px)
+            width: auto
+    .step:hover:not(.active)
+        border-bottom: 6px solid #343a40
+    .active
+        border-bottom: 6px solid #343a40
+    .complete
+        border-bottom: 6px solid #28a745
+    .spacer
+        display: inline-block
+        @media only screen and (max-width: 526px)
+            display: none

@@ -1,10 +1,12 @@
 import React from "react";
-import { Jumbotron, Row, Col } from "reactstrap";
+import { Jumbotron, Row, Col, Button } from "reactstrap";
 
 import "./Home.css";
 import groupImage from "../../../assets/images/group.svg";
 
-const home = () => {
+const home = props => {
+  const { history } = props;
+
   return (
     <div className="Home">
       <Jumbotron className="text-center">
@@ -15,22 +17,22 @@ const home = () => {
         <p>Want to Register and move your Chama online?</p>
         <Row>
           <Col md="6" className="mb-2">
-            <a
+            <Button
               className="btn btn-dark btn-block btn-lg mr-2"
-              href="/register"
+              onClick={() => { history.push("/register")}}
               role="button"
             >
               Register your Chama Now!
-            </a>
+            </Button>
           </Col>
           <Col md="6">
-            <a
+            <Button
               className="btn btn-outline-dark btn-block btn-lg"
-              href="/register"
+              onClick={() => { history.push("/login")}}
               role="button"
             >
               Login
-            </a>
+            </Button>
           </Col>
         </Row>
       </Jumbotron>
