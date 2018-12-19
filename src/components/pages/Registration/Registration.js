@@ -1,5 +1,14 @@
 import React, { Component } from "react";
-import { Form } from "reactstrap";
+import { 
+  Form, 
+  FormGroup, 
+  Label,
+  Input,
+  Row,
+  Col,
+  InputGroup,
+  Button,
+} from "reactstrap";
 
 import Steps from "./Steps/Steps";
 import "./Registration.sass";
@@ -12,40 +21,78 @@ export default class Registration extends Component {
         <Form method="POST" id="signup-form" className="signup-form">
           <Steps />
           <h3 className="text-center">Chama Details</h3>
-          <fieldset>
-            <legend>
-              <h5 className="step-heading text-center">
-                <span className="step-number">Step 1 / 4</span>
-              </h5>
-            </legend>
-            <div className="form-group">
-              <label for="first_name" className="form-label required">
-                First name
-              </label>
-              <input type="text" name="first_name" id="first_name" />
-            </div>
+          <h5 className="step-heading text-center mb-4">
+            <span className="step-number">Step 1 / 4</span>
+          </h5>
 
-            <div className="form-group">
-              <label for="last_name" className="form-label required">
-                Last name
-              </label>
-              <input type="text" name="last_name" id="last_name" />
-            </div>
+          <Row>
+            <Col>
+              <FormGroup>
+                <Label for="chamaName">Chama Name</Label>
+                <Input type="text" id="chamaName" className="font-weight-bold" />
+              </FormGroup>
+            </Col>
+            <Col>
+              <FormGroup>
+                <Label for="regNo">Registration Number</Label>
+                <Input type="text" id="regNo" className="font-weight-bold" />
+              </FormGroup>
+            </Col>
+          </Row>
 
-            <div className="form-group">
-              <label for="user_name" className="form-label required">
-                User name
-              </label>
-              <input type="text" name="user_name" id="user_name" />
-            </div>
+          <Row>
+            <Col>
+              <Label for="noOfMembers">Number of Members</Label>
+              <InputGroup>
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <i className="fa fa-group"></i>
+                  </div>
+                </div>
+                <Input type="number" id="noOfMembers" min="2" className="font-weight-bold" />
+              </InputGroup>
+            </Col>
+            <Col>
+              <FormGroup>
+                <Label for="website">Chama's Website Address</Label>
+                <Input type="text" id="website" className="font-weight-bold" />
+              </FormGroup>
+            </Col>
+          </Row>
 
-            <div className="form-group">
-              <label for="password" className="form-label required">
-                Password
-              </label>
-              <input type="password" name="password" id="password" />
-            </div>
-          </fieldset>
+          <Row>
+            <Col>
+              <Label for="chamaEmail">Chama's Email Address</Label>
+              <InputGroup>
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <i className="fa fa-envelope"></i>
+                  </div>
+                </div>
+                <Input type="email" id="chamaEmail" className="font-weight-bold" />
+              </InputGroup>
+            </Col>
+            <Col>
+              <Label for="chamaPhoneNo">Chama's Phone Number</Label>
+              <InputGroup>
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    <i className="fa fa-phone"></i>
+                  </div>
+                </div>
+                <Input type="text" id="chamaPhoneNo" className="font-weight-bold" />
+              </InputGroup>
+            </Col>
+          </Row>
+
+          <FormGroup className="mt-4 mb-4" check row>
+            <Col sm={{ size: 6 }} className="p-0 ml-0 pull-left">
+              <Button color="dark" outline block>Back</Button>
+            </Col>
+            <Col sm={{ size: 6 }} className="pull-right">
+              <Button color="dark" block>Submit</Button>
+            </Col>
+          </FormGroup>
         </Form>
       </div>
     );
