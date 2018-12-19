@@ -5,8 +5,6 @@ import Steps from "./Steps/Steps";
 import "./Registration.sass";
 
 export default class Registration extends Component {
-  
-
   render() {
     return (
       <div className="RegistrationWizard mt-4">
