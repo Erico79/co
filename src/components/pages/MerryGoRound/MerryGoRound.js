@@ -6,7 +6,7 @@ import "./MerryGoRound.css";
 const initialState = {
   shuffling: false,
   boxes: [],
-  no_of_boxes: 0,
+  no_of_boxes: null,
   winning_box: null,
   selected: []
 };
@@ -70,6 +70,7 @@ class MerryGoRound extends Component {
                 min="1"
                 onChange={this.setParticipants}
                 className="font-weight-bold"
+                value={this.state.no_of_boxes}
               />
             </FormGroup>
           </Col>
