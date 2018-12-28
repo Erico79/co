@@ -6,7 +6,7 @@ import "./MerryGoRound.css";
 const initialState = {
   shuffling: false,
   boxes: [],
-  no_of_boxes: 9,
+  no_of_boxes: 0,
   winning_box: null,
   selected: []
 };
@@ -15,6 +15,11 @@ class MerryGoRound extends Component {
   state = initialState;
 
   shuffle = () => {
+    if(!this.state.no_of_boxes){
+      alert('You must specify the number of participants first!');
+      return;
+    }
+    
     const a = [];
     for (let x = 0; x < this.state.no_of_boxes; x++) {
       a[x] = x + 1;
