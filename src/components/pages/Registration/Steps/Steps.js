@@ -6,7 +6,6 @@ const steps = [
     id: 1,
     name: "Chama Details",
     stepName: "Step 1",
-    active: true
   },
   {
     id: 2,
@@ -29,7 +28,7 @@ const Steps = props => {
   return (
     <ul className="progressbar">
       {steps.map(step => (
-        <li key={step.id} className={`${step.active && "active"}`}>
+        <li key={step.id} className={`${step.id <= props.currentStep && "active"}`}>
           {step.name}
         </li>
       ))}

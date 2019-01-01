@@ -6,7 +6,7 @@ import "./MerryGoRound.css";
 const initialState = {
   shuffling: false,
   boxes: [],
-  no_of_boxes: null,
+  no_of_boxes: '',
   winning_box: null,
   selected: []
 };
