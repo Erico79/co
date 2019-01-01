@@ -15,6 +15,9 @@
         cursor: pointer
         @media only screen and (max-width: $mobile)
             font-size: 0.750em
+        
+        @media only screen and (max-width: $small-device)
+            width: 20%
 
     li:before
         width: 30px
@@ -45,10 +48,10 @@
         content: none
 
     li.active
-        color: $green
+        color: $sandy-brown
 
     li.active:before
-        border-color: #55b776
+        border-color: $sandy-brown
 
     li.active + li:after
-      background-color: #55b776
+      background-color: $sandy-brown

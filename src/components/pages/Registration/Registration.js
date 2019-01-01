@@ -1,22 +1,28 @@
 import React, { Component } from "react";
-import { 
-  Form, 
-  FormGroup, 
-  Label,
-  Input,
-  Row,
-  Col,
-  InputGroup,
-  Button,
-} from "reactstrap";
+import { Form, Col, Button, Row } from "reactstrap";
 
 import Steps from "./Steps/Steps";
+import ChamaDetails from "./ChamaDetails";
+
 import "./Registration.sass";
 
 export default class Registration extends Component {
+  state = {
+    currentStep: 1
+  };
+
   render() {
+    let nextOptions = { size: 6 };
+    let xs = 6;
+    const { currentStep } = this.state;
+
+    if (currentStep === 1) {
+      nextOptions.offset = 3;
+      xs = 12;
+    }
+
     return (
-      <div className="RegistrationWizard mt-4">
+      <div className="RegistrationWizard">
         <h2 className="text-center font-weight-bold">Register your Chama</h2>
         <Form method="POST" id="signup-form" className="signup-form">
           <Steps />
@@ -25,74 +31,22 @@ export default class Registration extends Component {
             <span className="step-number">Step 1 / 4</span>
           </h5>
 
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label for="chamaName">Chama Name</Label>
-                <Input type="text" id="chamaName" className="font-weight-bold" />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <Label for="regNo">Registration Number</Label>
-                <Input type="text" id="regNo" className="font-weight-bold" />
-              </FormGroup>
+          <ChamaDetails />
+
+          <Row className="mt-3 mb-3">
+            {currentStep > 1 && (
+              <Col md={{ size: 6 }} xs="6" className="mb-3">
+                <Button type="button" color="dark" outline block size="lg">
+                <i className="fa fa-arrow-left"></i> Back
+                </Button>
+              </Col>
+            )}
+            <Col md={nextOptions} xs={xs}>
+              <Button type="button" color="dark" block size="lg">
+                Next <i className="fa fa-arrow-right"></i>
+              </Button>
             </Col>
           </Row>
-
-          <Row>
-            <Col>
-              <Label for="noOfMembers">Number of Members</Label>
-              <InputGroup>
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    <i className="fa fa-group"></i>
-                  </div>
-                </div>
-                <Input type="number" id="noOfMembers" min="2" className="font-weight-bold" />
-              </InputGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <Label for="website">Chama's Website Address</Label>
-                <Input type="text" id="website" className="font-weight-bold" />
-              </FormGroup>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col>
-              <Label for="chamaEmail">Chama's Email Address</Label>
-              <InputGroup>
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    <i className="fa fa-envelope"></i>
-                  </div>
-                </div>
-                <Input type="email" id="chamaEmail" className="font-weight-bold" />
-              </InputGroup>
-            </Col>
-            <Col>
-              <Label for="chamaPhoneNo">Chama's Phone Number</Label>
-              <InputGroup>
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    <i className="fa fa-phone"></i>
-                  </div>
-                </div>
-                <Input type="text" id="chamaPhoneNo" className="font-weight-bold" />
-              </InputGroup>
-            </Col>
-          </Row>
-
-          <FormGroup className="mt-4 mb-4" check row>
-            <Col sm={{ size: 6 }} className="p-0 ml-0 pull-left">
-              <Button color="dark" outline block>Back</Button>
-            </Col>
-            <Col sm={{ size: 6 }} className="pull-right">
-              <Button color="dark" block>Submit</Button>
-            </Col>
-          </FormGroup>
         </Form>
       </div>
     );
