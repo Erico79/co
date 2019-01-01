@@ -7,7 +7,7 @@
     height: auto;
 }
 
-.MerryGoRound Button.btn-secondary, Button.btn-success {
+.MerryGoRound Button.btn-secondary, .MerryGoRound Button.btn-success {
     width: 50%;
 }
 

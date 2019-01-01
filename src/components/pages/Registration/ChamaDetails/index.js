@@ -1,44 +1,89 @@
 import React from 'react';
-import { 
-    FormGroup, 
+import { Field, reduxForm } from 'redux-form';
+import { connect } from 'react-redux';
+import {
     Label,
     Input,
     Col,
     InputGroup,
     Row,
+    Form,
+    Button,
 } from "reactstrap";
 
-const ChamaDetails = () => {
+import renderFormGroup from '../../../ui/FormControls/renderFormGroup';
+import { submitChamaDetails } from '../../../../store/modules/chamaDetails';
+
+let ChamaDetails = props => {
+    const { handleSubmit, load, pristine, reset, submitting, formValues, currentStep } = props;
+    let nextOptions = { size: 6 };
+    let xs = 6;
+
     return ( 
         <div className="ChamaDetails">
             <h3 className="text-center">Chama Details</h3>
             <h5 className="step-heading text-center mb-4">
-                <span className="step-number">Step 1 / 4</span>
+                <span className="step-number">Step <strong>1</strong> / 4</span>
             </h5>
-            <Row>
-                <Col md={{ size: 6, offset: 3 }}>
-                    <FormGroup>
-                        <Label for="chamaName">Chama Name</Label>
-                        <Input type="text" id="chamaName" className="font-weight-bold" />
-                    </FormGroup>
-                    <FormGroup>
-                        <Label for="regNo">Registration Number</Label>
-                        <Input type="text" id="regNo" className="font-weight-bold" />
-                    </FormGroup>
 
-                    <Label for="noOfMembers">Number of Members</Label>
-                    <InputGroup className="mb-3">
-                        <div class="input-group-prepend">
-                            <div class="input-group-text">
-                            <i className="fa fa-group"></i>
+            <Form onSubmit={handleSubmit}>
+                <Row>
+                    <Col md={{ size: 6, offset: 3 }}>
+                        <Field 
+                            name="chamaName"
+                            label="Chama Name"
+                            component={renderFormGroup}
+                            type="text"
+                            id="firstName"
+                        />
+
+                        <Label for="noOfMembers">Number of Members</Label>
+                        <InputGroup className="mb-3">
+                            <div className="input-group-prepend">
+                                <div className="input-group-text">
+                                <i className="fa fa-group"></i>
+                                </div>
                             </div>
-                        </div>
-                        <Input type="number" id="noOfMembers" min="2" className="font-weight-bold" />
-                    </InputGroup>
-                </Col>
-            </Row>
+                            <Input type="number" id="noOfMembers" min="2" />
+                        </InputGroup>
+                    </Col>
+                </Row>
+
+                <Row className="mt-3 mb-3">
+                    <Col md={{ size: 6 }} xs="6" className="mb-3">
+                        <Button type="button" color="dark" outline block size="lg" onClick={this.handleBack}>
+                        <i className="fa fa-arrow-left"></i> Back
+                        </Button>
+                    </Col>
+                    <Col md={{ size: 6, offset: 3 }} xs="12">
+                        <Button 
+                            type="button" 
+                            color="dark"
+                            block 
+                            size="lg"
+                            onClick={this.handleNext}
+                        >
+                            Save and Continue <i className="fa fa-arrow-right"></i>
+                        </Button>
+                    </Col>
+          </Row>
+            </Form>
         </div>
     );
 }
- 
+
+ChamaDetails = reduxForm({
+    form: 'chamaDetails',
+})(ChamaDetails);
+
+const mapStateToProps = state => ({
+    initialValues: state.chamaDetails.info
+});
+
+const mapDispatchToProps = dispatch => ({
+    submitChamaDetails: values => dispatch(submitChamaDetails(values))
+})
+
+ChamaDetails = connect(mapStateToProps, mapDispatchToProps)(ChamaDetails)
+
 export default ChamaDetails;

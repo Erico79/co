@@ -30,10 +30,10 @@ export default class Registration extends Component {
   switchComponents() {
     switch(this.state.currentStep) {
       case 1:
-        return <ChamaDetails />;
+        return <ChamaDetails {...this.state} />;
 
       case 2:
-        return <ChamaAdmin />;
+        return <ChamaAdmin {...this.state} />;
 
       default:
         return null;
@@ -41,38 +41,13 @@ export default class Registration extends Component {
   }
 
   render() {
-    let nextOptions = { size: 6 };
-    let xs = 6;
-    const { currentStep } = this.state;
-
-    if (currentStep === 1) {
-      nextOptions.offset = 3;
-      xs = 12;
-    }
 
     return (
       <div className="RegistrationWizard">
         <h2 className="text-center font-weight-bold">Register your Chama</h2>
-        <Form method="POST" id="signup-form" className="signup-form">
-          <Steps currentStep={currentStep} />
+          <Steps currentStep={this.state.currentStep} />
 
           {this.switchComponents()}
-
-          <Row className="mt-3 mb-3">
-            {currentStep > 1 && (
-              <Col md={{ size: 6 }} xs="6" className="mb-3">
-                <Button type="button" color="dark" outline block size="lg" onClick={this.handleBack}>
-                  <i className="fa fa-arrow-left"></i> Back
-                </Button>
-              </Col>
-            )}
-            <Col md={nextOptions} xs={xs}>
-              <Button type="button" color="dark" block size="lg" onClick={this.handleNext}>
-                Next <i className="fa fa-arrow-right"></i>
-              </Button>
-            </Col>
-          </Row>
-        </Form>
       </div>
     );
   }
