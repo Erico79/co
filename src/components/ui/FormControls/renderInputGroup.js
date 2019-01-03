@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Label, Input, InputGroup } from "reactstrap";
+import { Label, Input, InputGroup, FormText } from "reactstrap";
 
 const renderInputGroup = props => {
   const {
@@ -8,7 +8,8 @@ const renderInputGroup = props => {
     type,
     id,
     icon,
-    meta: { touched, warning, error }
+    meta: { touched, warning, error },
+    children,
   } = props;
 
   const validity = touched ? (error ? "is-invalid" : "is-valid") : "";
@@ -31,6 +32,7 @@ const renderInputGroup = props => {
         {(touched &&
           (error && <div className="invalid-feedback">{error}</div>)) ||
           (warning && <div className="text-danger">{warning}</div>)}
+        {children}
       </InputGroup>
     </Fragment>
   );

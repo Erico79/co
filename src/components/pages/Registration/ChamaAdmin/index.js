@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Label, Input, InputGroup, Form, Button } from "reactstrap";
+import { Row, Col, FormText, Form, Button } from "reactstrap";
 import { Field, reduxForm } from "redux-form";
 
 import renderInputGroup from "../../../ui/FormControls/renderInputGroup";
@@ -77,7 +77,12 @@ let ChamaAdmin = props => {
               component={renderInputGroup}
               icon="fa fa-lock"
               type="password"
-            />
+            >
+              <FormText color="muted">
+                The password must be at least <strong>6 characters</strong> long. 
+                It should have at least a <b>Capital Letter</b> & a <b>Number</b>.
+              </FormText>
+            </Field>
           </Col>
           <Col md="6">
             <Field
