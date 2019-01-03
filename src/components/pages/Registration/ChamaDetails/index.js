@@ -10,10 +10,11 @@ import renderInputGroup from "../../../ui/FormControls/renderInputGroup";
 import validate from "./validate";
 
 let ChamaDetails = props => {
-  const { handleSubmit } = props;
+  const { handleSubmit, handleNext } = props;
 
-  const submit = values => {
-    props.submitChamaDetails(values);
+  const submit = async(values) => {
+    await props.submitChamaDetails(values);
+    handleNext();
   };
 
   return (
