@@ -1,19 +1,33 @@
-import React from 'react';
-import {
-    FormGroup,
-    Label,
-    Input,
-} from 'reactstrap';
+import React from "react";
+import { FormGroup, Label, Input } from "reactstrap";
 
 const renderFormGroup = props => {
-    const { label, input, type, meta: { touched, warning, error } } = props;
-    console.log(input);
-    return ( 
-        <FormGroup>
-            <Label for="chamaName">{label}</Label>
-            <Input {...input} />
-        </FormGroup>
-    );
-}
- 
+  const {
+    label,
+    input,
+    type,
+    id,
+    meta: { touched, warning, error }
+  } = props;
+
+  const validity = touched ? (error ? "is-invalid" : "is-valid") : ""
+  return (
+    <FormGroup>
+      <Label for={id}>{label}</Label>
+      <Input
+        {...input}
+        type={type}
+        id={id}
+        className={validity}
+        autoComplete="off"
+      />
+      {(touched &&
+        (error && (
+          <div className="invalid-feedback">{error}</div>
+        ))) ||
+        (warning && <div className="text-danger">{warning}</div>)}
+    </FormGroup>
+  );
+};
+
 export default renderFormGroup;

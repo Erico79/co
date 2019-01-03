@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Form, Col, Button, Row } from "reactstrap";
 
 import Steps from "./Steps/Steps";
 import ChamaDetails from "./ChamaDetails";
@@ -30,10 +29,10 @@ export default class Registration extends Component {
   switchComponents() {
     switch(this.state.currentStep) {
       case 1:
-        return <ChamaDetails {...this.state} />;
+        return <ChamaDetails {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
 
       case 2:
-        return <ChamaAdmin {...this.state} />;
+        return <ChamaAdmin {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
 
       default:
         return null;

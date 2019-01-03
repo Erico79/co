@@ -37,7 +37,9 @@ const chamaDetailsReducer = (state = initialState, action) => {
 
 // action creators
 export function submitChamaDetails (chamaDetails) {
-
+    return dispatch => {
+        dispatch({type: SUBMIT_CHAMA_DETAILS_REQUEST});
+    }
 }
 
 export default chamaDetailsReducer;
