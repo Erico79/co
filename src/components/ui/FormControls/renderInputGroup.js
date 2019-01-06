@@ -1,5 +1,5 @@
 import React, { Fragment } from "react";
-import { Label, Input, InputGroup, FormText } from "reactstrap";
+import { Label, Input, InputGroup } from "reactstrap";
 
 const renderInputGroup = props => {
   const {
@@ -25,7 +25,7 @@ const renderInputGroup = props => {
         <Input
           {...input}
           type={type}
-          id={type}
+          id={id}
           className={validity}
           autoComplete="off"
         />

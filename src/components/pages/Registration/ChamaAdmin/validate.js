@@ -6,7 +6,7 @@ const validate = values => {
   if (!values.otherNames) errors.otherNames = "Please enter your Other Names!";
 
   if (!values.email) errors.email = "Please provide your Email Address!";
-  else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(values.email))
+  else if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(values.email))
     errors.email = "Please provide a valid email!";
 
   if (!values.mobilePhone)

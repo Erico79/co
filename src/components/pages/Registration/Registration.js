@@ -10,7 +10,7 @@ export default class Registration extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentStep: 2
+      currentStep: 1
     };
 
     this.handleNext = this.handleNext.bind(this);
