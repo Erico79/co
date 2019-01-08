@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should render correctly 1`] = `
+<div
+  className="App"
+>
+  <withRouter(Header) />
+  <Container
+    className="wrapper"
+    tag="div"
+  >
+    <Switch>
+      <Route
+        component={[Function]}
+        exact={true}
+        path="/register"
+      />
+      <Route
+        component={[Function]}
+        exact={true}
+        path="/merry-go-round"
+      />
+      <Route
+        component={[Function]}
+        exact={true}
+        path="/"
+      />
+    </Switch>
+  </Container>
+</div>
+`;
