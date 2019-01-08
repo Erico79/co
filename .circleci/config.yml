@@ -1,0 +1,175 @@
+version: 2.1
+executors:
+  node-executor:
+    docker:
+      - image: node:10
+    working_directory: ~/co
+  
+  docker-executor:
+    docker:
+      - image: docker:17.05.0-ce-git
+    working_directory: ~/co
+
+jobs:
+  install_dependencies:
+    executor: node-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: Cardinal-{{ checksum 'package.json' }}-{{ .Branch }}
+          paths:
+            - C-{{ checksum 'package.json' }}
+      
+      - run:
+          name: Download dependencies
+          command: npm install
+      
+      - save_cache:
+          key: Cardinal-{{ checksum 'package.json' }}-{{ .Branch }}
+          paths:
+            - C-{{ checksum 'package.json' }}
+  
+      - persist_to_workspace:
+          root: .
+          paths: .
+  
+  test:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: Cardinal-{{ checksum 'package.json' }}-{{ .Branch }}
+          paths:
+            - C-{{ checksum 'package.json' }}
+      
+      - run:
+          name: tests
+          command: npm run test
+      
+      - persist_to_workspace:
+          root: .
+          paths: .
+    
+  build:
+    executor: node-executor
+    steps:
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          key: Cardinal-{{ checksum 'package.json' }}-{{ .Branch }}
+          paths:
+            - C-{{ checksum 'package.json' }}
+
+      - run:
+          name: Build application
+          command: npm run build
+      
+      - persist_to_workspace:
+          root: .
+          paths: .
+  
+  build_docker_image:
+    executor: docker-executor
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Build application Docker image
+          command: |
+            docker build -t erico79/co:$CIRCLE_SHA1 .
+      
+      - run:
+          name: Save application Docker image
+          command: |
+            docker save -o co-image.tar erico79/co:$CIRCLE_SHA1
+      
+      - persist_to_workspace:
+          root: .
+          paths: .
+  
+  push_latest:
+    executor: docker-executor
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Load application Docker image
+          command: |
+            docker load --input co-image.tar
+      
+      - run:
+          name: Tag docker image
+          command: |
+            docker tag erico79/co:$CIRCLE_SHA1 erico79/co:latest
+      
+      - run:
+          name: Push application Docker image
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push erico79/co:$CIRCLE_SHA1
+            docker push erico79/co:latest
+
+  push_production:
+    executor: docker-executor
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Load application Docker image
+          command: |
+            docker load --input co-image.tar
+             
+      - run:
+          name: Tag docker image
+          command: |
+            docker tag erico79/co:$CIRCLE_SHA1 erico79/co:production
+      - run:
+          name: Push application Docker image
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push erico79/co:$CIRCLE_SHA1
+            docker push erico79/co:production
+  
+
+workflows:
+  version: 2
+  build_deploy:
+    jobs:
+      - install_dependencies
+      - test:
+          requires:
+            - install_dependencies
+      - build:
+          requires:
+            - test
+      - build_docker_image:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - develop
+                - master
+      - push_latest:
+          context: cardinal
+          requires:
+              - build_docker_image
+          filters:
+            branches:
+              only: develop
+      - push_production:
+          context: cardinal
+          requires:
+            - build_docker_image
+          filters:
+            branches:
+              only: master
+            
+        
