@@ -15,7 +15,7 @@ RUN chmod -Rc a+w /var/cache/nginx
 # Allow all users to write to /run (for nginx.pid files)
 RUN chmod -c a+w /run
 
-COPY /usr/src/app/build /usr/share/nginx/html
+COPY build /usr/share/nginx/html
 
 # Switch to our user
 USER user
