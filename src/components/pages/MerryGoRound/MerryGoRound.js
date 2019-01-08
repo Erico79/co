@@ -18,7 +18,7 @@ class MerryGoRound extends Component {
     if(!this.state.no_of_boxes){
       alert('You must specify the number of participants first!');
       return;
-    };
+    }
     
     const a = [];
     for (let x = 0; x < this.state.no_of_boxes; x++) {
