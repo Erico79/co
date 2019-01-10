@@ -13,8 +13,13 @@ class ChamaDetails extends Component {
   submit = async values => {
     const { submitChamaDetails, handleNext } = this.props;
 
-    if (this.props.initialValues !== values)
-      await submitChamaDetails(values);
+    if (this.props.initialValues !== values) {
+      if (this.props.group == null) {
+        await submitChamaDetails(values);
+      } else {
+        await submitChamaDetails(values, this.props.group.id);
+      }
+    }
     
     if (this.props.stepSuccess) {
       handleNext();
@@ -88,10 +93,11 @@ const mapStateToProps = state => ({
   initialValues: state.chamaDetails.info,
   isLoading: state.chamaDetails.isLoading,
   stepSuccess: state.chamaDetails.stepSuccess,
+  group: state.chamaDetails.group,
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitChamaDetails: values => dispatch(submitChamaDetails(values)),
+  submitChamaDetails: (values, groupId) => dispatch(submitChamaDetails(values, groupId)),
 });
 
 ChamaDetails = connect(

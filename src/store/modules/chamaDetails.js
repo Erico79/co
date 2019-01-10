@@ -11,6 +11,7 @@ const initialState = {
   info: {},
   stepSuccess: false,
   alreadySubmitted: false,
+  group: null
 };
 
 const chamaDetailsReducer = (state = initialState, action) => {
@@ -28,7 +29,8 @@ const chamaDetailsReducer = (state = initialState, action) => {
         info: action.payload.data,
         message: action.payload.message,
         stepSuccess: true,
-        group: action.payload.group
+        group: action.payload.group,
+        alreadySubmitted: false,
       };
 
     case SUBMIT_CHAMA_DETAILS_FAILURE:
@@ -36,7 +38,8 @@ const chamaDetailsReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         errorMessage: action.payload.errorMessage,
-        error: action.payload.error
+        error: action.payload.error,
+        stepSuccess: false,
       };
 
     case ALREADY_SUBMITTED:
@@ -51,15 +54,16 @@ const chamaDetailsReducer = (state = initialState, action) => {
 };
 
 // action creators
-export function submitChamaDetails(chamaDetails) {
-  return async dispatch => {
+export function submitChamaDetails(chamaDetails, group_id) {
+  return async (dispatch, getState) => {
     dispatch({ type: SUBMIT_CHAMA_DETAILS_REQUEST });
 
     try {
       const { chamaName, noOfMembers } = chamaDetails;
       const response = await axios.post("/register/group", {
         name: chamaName,
-        no_of_members: noOfMembers
+        no_of_members: noOfMembers,
+        group_id
       });
 
       if (response.data.success) {
@@ -68,7 +72,7 @@ export function submitChamaDetails(chamaDetails) {
           payload: {
             data: chamaDetails,
             message: "Chama Details have been saved.",
-            group: response.data.group
+            group: response.data.group,
           }
         });
       }
