@@ -12,7 +12,8 @@ import {
   UncontrolledDropdown,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Container,
 } from "reactstrap";
 
 import "./Header.sass";
@@ -35,12 +36,18 @@ class Header extends Component {
     });
   }
 
+  componentWillReceiveProps() {
+    this.setState({isOpen: false});
+  }
+
   render() {
     const { history } = this.props;
+
 
     return (
       <div className="Header">
         <Navbar fixed="top" color="dark" dark expand="md">
+          <Container>
           <NavbarBrand href="#" onClick={() => history.push("/")}>
             <img
               src={logo}
@@ -109,6 +116,7 @@ class Header extends Component {
               </UncontrolledDropdown>
             </Nav>
           </Collapse>
+          </Container>
         </Navbar>
       </div>
     );
