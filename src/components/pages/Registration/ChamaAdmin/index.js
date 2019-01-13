@@ -161,7 +161,7 @@ const mapStateToProps = state => ({
   // isLoading: state.chamaAdmin.isLoading,
   chamaDetailsSuccess: state.chamaDetails.stepSuccess,
   chamaDetailsSuccessMessage: state.chamaDetails.message,
-  chamaDetailsAlreadySubmitted: state.chamaDetails.alreadySubmitted
+  chamaDetailsAlreadySubmitted: state.chamaDetails.alreadySubmitted,
   // stepSuccess: state.chamaAdmin.stepSuccess,
 });
 

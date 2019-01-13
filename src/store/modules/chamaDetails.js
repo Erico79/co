@@ -3,15 +3,20 @@ import axios from "../../axios";
 const SUBMIT_CHAMA_DETAILS_REQUEST = "chama-app/SUBMIT_CHAMA_DETAILS_REQUEST";
 const SUBMIT_CHAMA_DETAILS_SUCCESS = "chama-app/SUBMIT_CHAMA_DETAILS_SUCCESS";
 const SUBMIT_CHAMA_DETAILS_FAILURE = "chama-app/SUBMIT_CHAMA_DETAILS_FAILURE";
+const SUBMIT_CHAMA_DETAILS_ERROR = "chama-app/SUBMIT_CHAMA_DETAILS_ERROR";
 const ALREADY_SUBMITTED = "chama-app/ALREADY_SUBMITTED";
 
 const initialState = {
   isLoading: false,
   errorMessage: "",
-  info: {},
+  info: {
+    chamaName: 'Inuka Youth Group',
+    noOfMembers: 3
+  },
   stepSuccess: false,
   alreadySubmitted: false,
-  group: null
+  group: null,
+  errors: {},
 };
 
 const chamaDetailsReducer = (state = initialState, action) => {
@@ -31,6 +36,8 @@ const chamaDetailsReducer = (state = initialState, action) => {
         stepSuccess: true,
         group: action.payload.group,
         alreadySubmitted: false,
+        errors: {},
+        errorMessage: ''
       };
 
     case SUBMIT_CHAMA_DETAILS_FAILURE:
@@ -39,6 +46,15 @@ const chamaDetailsReducer = (state = initialState, action) => {
         isLoading: false,
         errorMessage: action.payload.errorMessage,
         error: action.payload.error,
+        stepSuccess: false,
+        errors: {},
+      };
+
+    case SUBMIT_CHAMA_DETAILS_ERROR:
+      return {
+        ...state,
+        isLoading: false,
+        errors: action.payload.errors,
         stepSuccess: false,
       };
 
@@ -55,7 +71,7 @@ const chamaDetailsReducer = (state = initialState, action) => {
 
 // action creators
 export function submitChamaDetails(chamaDetails, group_id) {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     dispatch({ type: SUBMIT_CHAMA_DETAILS_REQUEST });
 
     try {
@@ -73,6 +89,13 @@ export function submitChamaDetails(chamaDetails, group_id) {
             data: chamaDetails,
             message: "Chama Details have been saved.",
             group: response.data.group,
+          }
+        });
+      } else {
+        dispatch({
+          type: SUBMIT_CHAMA_DETAILS_ERROR,
+          payload: {
+            errors: response.data.errors,
           }
         });
       }

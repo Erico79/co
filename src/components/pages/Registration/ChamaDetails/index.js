@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Field, reduxForm } from "redux-form";
+import { Field, reduxForm, SubmissionError } from "redux-form";
 import { connect } from "react-redux";
 import { Col, Row, Form, Button } from "reactstrap";
+import NotificationAlert from 'react-notification-alert';
 
 import renderFormGroup from "../../../ui/FormControls/renderFormGroup";
 import { submitChamaDetails } from "../../../../store/modules/chamaDetails";
@@ -13,16 +14,47 @@ class ChamaDetails extends Component {
   submit = async values => {
     const { submitChamaDetails, handleNext } = this.props;
 
-    if (this.props.initialValues !== values) {
+    // if (this.props.initialValues !== values) {
       if (this.props.group == null) {
         await submitChamaDetails(values);
       } else {
         await submitChamaDetails(values, this.props.group.id);
       }
+    // }
+
+    if (Object.keys(this.props.errors).length) {
+      const { name, no_of_members } = this.props.errors;
+
+      if (name) {
+        throw new SubmissionError({
+          chamaName: name,
+        });
+      }
+
+      if (no_of_members) {
+        throw new SubmissionError({
+          noOfMembers: no_of_members,
+        })
+      }
     }
     
     if (this.props.stepSuccess) {
       handleNext();
+    }
+
+    if (this.props.errorMessage) {
+      this.refs.notify.notificationAlert({
+        place: 'tr',
+        type: 'danger',
+        icon: 'fa fa-bell',
+        autoDismiss: 7,
+        message: <div>
+          <div>
+            <b>Error!</b> - {this.props.errorMessage}
+            </div>
+          </div>,
+        closeButton: true,
+      })
     }
   };
 
@@ -31,6 +63,7 @@ class ChamaDetails extends Component {
 
     return (
       <div className="ChamaDetails">
+        <NotificationAlert ref="notify" />
         <h3 className="text-center">Chama Details</h3>
         <h5 className="step-heading text-center mb-4">
           <span className="step-number">
@@ -94,6 +127,8 @@ const mapStateToProps = state => ({
   isLoading: state.chamaDetails.isLoading,
   stepSuccess: state.chamaDetails.stepSuccess,
   group: state.chamaDetails.group,
+  errors: state.chamaDetails.errors,
+  errorMessage: state.chamaDetails.errorMessage,
 });
 
 const mapDispatchToProps = dispatch => ({
