@@ -1,6 +1,22 @@
+@import '../../../styles/variables.sass'
+    
 .Header
-    .nav-link, .dropdown-item
-        cursor: pointer
+    .navbar
+        background-color: $primary
+        color: white
 
-    .nav-item
-        font-weight: bold
+        .navbar-brand
+            color: white
+            cursor: pointer
+
+            &:hover
+                font-weight: bold
+
+        .nav-item
+            cursor: pointer
+
+            &:hover
+                font-weight: bold
+
+            a.dropdown-toggle
+                color: #fff

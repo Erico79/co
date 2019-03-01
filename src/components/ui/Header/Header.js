@@ -46,7 +46,7 @@ class Header extends Component {
 
     return (
       <div className="Header">
-        <Navbar fixed="top" color="dark" dark expand="md">
+        <Navbar fixed="top" expand="md">
           <Container>
           <NavbarBrand href="#" onClick={() => history.push("/")}>
             <img

@@ -14,13 +14,13 @@ class ChamaDetails extends Component {
   submit = async values => {
     const { submitChamaDetails, handleNext } = this.props;
 
-    // if (this.props.initialValues !== values) {
+    if (this.props.initialValues !== values) {
       if (this.props.group == null) {
         await submitChamaDetails(values);
       } else {
         await submitChamaDetails(values, this.props.group.id);
       }
-    // }
+    }
 
     if (Object.keys(this.props.errors).length) {
       const { name, no_of_members } = this.props.errors;
@@ -86,7 +86,7 @@ class ChamaDetails extends Component {
                 name="noOfMembers"
                 label="Number of Members"
                 component={renderInputGroup}
-                type="text"
+                type="number"
                 id="noOfMembers"
                 icon="fa fa-group"
               />
@@ -99,13 +99,11 @@ class ChamaDetails extends Component {
                 color="dark"
                 block
                 size="lg"
-                className="submit-btn"
+                className="submit-btn btn-primary"
                 disabled={this.props.isLoading}
               >
                 Next{" "}
-                {!this.props.isLoading ? (
-                  <i className="fa fa-arrow-right" />
-                ) : (
+                {this.props.isLoading && (
                   <i className="fa fa-circle-o-notch fa-spin" />
                 )}
               </Button>

@@ -7,6 +7,8 @@ import NotificationAlert from "react-notification-alert";
 import renderInputGroup from "../../../ui/FormControls/renderInputGroup";
 import validate from "./validate";
 import { alreadySubmitted } from '../../../../store/modules/chamaDetails';
+import { submitChamaAdminDetails } from "../../../../store/modules/chamaAdmin";
+import OTPModal from './Modals/OTPModal';
 
 let options = {
   place: "tr",
@@ -16,10 +18,21 @@ let options = {
   closeButton: true
 };
 class ChamaAdmin extends Component {
-  submit = values => {
-    // open OTP modal to verify the mobile phone number and the email address
-    this.props.handleNext();
+  state = {
+    otpModalIsOpen: false,
+  }
+
+  submit = async values => {
+    // if (this.props.group_id) {
+    //   await this.props.submitAdmindetails(values, this.props.group_id);
+    // }
+    // this.props.handleNext();
+    this.openOTPModal();
   };
+
+  validateEmailAndMobileNo = otp => {
+    
+  }
 
   componentDidMount() {
     if (this.props.chamaDetailsSuccess && !this.props.chamaDetailsAlreadySubmitted) {
@@ -33,6 +46,14 @@ class ChamaAdmin extends Component {
       this.refs.notify.notificationAlert(options);
       this.props.alreadySubmitted();
     }
+  };
+
+  openOTPModal = () => {
+    this.setState({ otpModalIsOpen: true });
+  }
+
+  closeOtpModal = () => {
+    this.setState({ otpModalIsOpen: false });
   }
 
   render() {
@@ -41,6 +62,12 @@ class ChamaAdmin extends Component {
     return (
       <div className="ChamaAdmin">
         <NotificationAlert ref="notify" />
+        <OTPModal 
+          closeModal={this.closeOtpModal} 
+          isModalOpen={this.state.otpModalIsOpen}
+          className="otp-modal"
+          email={this.props.initialValues.email}
+        />
         <h3 className="text-center">Chama Administrator</h3>
         <h5 className="step-heading text-center mb-4">
           <span className="step-number">
@@ -61,8 +88,8 @@ class ChamaAdmin extends Component {
             </Col>
             <Col md="6">
               <Field
-                label="Other Names"
-                name="otherNames"
+                label="Last Name"
+                name="lastName"
                 id="otherNames"
                 component={renderInputGroup}
                 icon="fa fa-user-circle"
@@ -125,16 +152,16 @@ class ChamaAdmin extends Component {
 
           <Row className="mt-3 mb-3">
             <Col md={{ size: 6 }} xs="6">
-              <Button color="dark" block outline size="lg" onClick={handleBack}>
+              <Button block className="btn-outline-primary" size="lg" onClick={handleBack}>
                 <i className="fa fa-arrow-left" /> Back
               </Button>
             </Col>
             <Col md={{ size: 6 }} xs="6">
               <Button
-                color="dark"
                 block
                 size="lg"
                 disabled={this.props.isLoading}
+                className="btn-primary"
               >
                 Next{" "}
                 {!this.props.isLoading ? (
@@ -157,15 +184,18 @@ ChamaAdmin = reduxForm({
 })(ChamaAdmin);
 
 const mapStateToProps = state => ({
-  // initialValues: state.chamaAdmin.info,
-  // isLoading: state.chamaAdmin.isLoading,
+  initialValues: state.chamaAdmin.info,
+  isLoading: state.chamaAdmin.isLoading,
   chamaDetailsSuccess: state.chamaDetails.stepSuccess,
   chamaDetailsSuccessMessage: state.chamaDetails.message,
   chamaDetailsAlreadySubmitted: state.chamaDetails.alreadySubmitted,
-  // stepSuccess: state.chamaAdmin.stepSuccess,
+  // group_id: state.chamaDetails.group.id,
+  stepSuccess: state.chamaAdmin.stepSuccess,
+  otpIsValid: state.chamaAdmin.otpIsValid,
 });
 
 const mapDispatchToProps = dispatch => ({
+  submitAdmindetails: (values, group_id) => dispatch(submitChamaAdminDetails(values, group_id)),
   alreadySubmitted: () => dispatch(alreadySubmitted()),
 });
 

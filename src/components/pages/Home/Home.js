@@ -1,7 +1,7 @@
 import React from "react";
 import { Jumbotron, Row, Col, Button } from "reactstrap";
 
-import "./Home.css";
+import "./Home.sass";
 import groupImage from "../../../assets/images/group.svg";
 
 const home = props => {
@@ -18,7 +18,7 @@ const home = props => {
         <Row>
           <Col md="6" className="mb-2">
             <Button
-              className="btn btn-dark btn-block btn-lg mr-2"
+              className="btn btn-primary btn-block btn-lg mr-2"
               onClick={() => { history.push("/register")}}
               role="button"
             >
@@ -27,7 +27,7 @@ const home = props => {
           </Col>
           <Col md="6">
             <Button
-              className="btn btn-outline-dark btn-block btn-lg"
+              className="btn btn-outline-primary btn-block btn-lg"
               onClick={() => { history.push("/login")}}
               role="button"
             >

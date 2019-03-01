@@ -7,7 +7,7 @@ import Header from "./components/ui/Header/Header";
 import Home from "./components/pages/Home/Home";
 import MerryGoRound from "./components/pages/MerryGoRound/MerryGoRound";
 import Registration from "./components/pages/Registration/Registration";
-import "./App.css";
+import "./App.sass";
 
 class App extends Component {
   render() {
