@@ -1,10 +1,15 @@
+@import '../../../styles/variables.sass'
+  
 .Home
-    height: auto
+  height: auto
     
-    .jumbotron 
-        border-radius: 0px
-        background-color: #fff
-        height: auto
+  .jumbotron 
+    border-radius: 0px
+    background-color: #fff
+    height: auto
 
-        >img
-            width: 100%
+    >img
+      width: 100%
+
+      @media screen and (min-width: $mobile)
+        height: 550px

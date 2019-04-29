@@ -1,4 +1,6 @@
-import axios from "../../axios";
+import axios from 'axios';
+
+import { BASE_URL } from '../../constants';
 
 const SUBMIT_CHAMA_DETAILS_REQUEST = "chama-app/SUBMIT_CHAMA_DETAILS_REQUEST";
 const SUBMIT_CHAMA_DETAILS_SUCCESS = "chama-app/SUBMIT_CHAMA_DETAILS_SUCCESS";
@@ -24,7 +26,7 @@ const chamaDetailsReducer = (state = initialState, action) => {
     case SUBMIT_CHAMA_DETAILS_REQUEST:
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
       };
 
     case SUBMIT_CHAMA_DETAILS_SUCCESS:
@@ -76,10 +78,10 @@ export function submitChamaDetails(chamaDetails, group_id) {
 
     try {
       const { chamaName, noOfMembers } = chamaDetails;
-      const response = await axios.post("/register/group", {
+      const response = await axios.post(`${BASE_URL}/register/group`, {
         name: chamaName,
         no_of_members: noOfMembers,
-        group_id
+        group_id,
       });
 
       if (response.data.success) {

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import PropTypes from 'prop-types'
 import { Row, Col, FormText, Form, Button } from "reactstrap";
 import { Field, reduxForm } from "redux-form";
 import { connect } from "react-redux";
@@ -18,16 +19,23 @@ let options = {
   closeButton: true
 };
 class ChamaAdmin extends Component {
+  static propTypes = {
+    history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
+  }
+
   state = {
     otpModalIsOpen: false,
   }
 
   submit = async values => {
-    // if (this.props.group_id) {
-    //   await this.props.submitAdmindetails(values, this.props.group_id);
-    // }
-    // this.props.handleNext();
-    this.openOTPModal();
+    const { history, group_id, submitAdminDetails } = this.props;
+
+    if (group_id) {
+      await submitAdminDetails(values, group_id);
+      return this.openOTPModal();
+    }
+    
+    history.push('/');
   };
 
   validateEmailAndMobileNo = otp => {
@@ -66,7 +74,7 @@ class ChamaAdmin extends Component {
           closeModal={this.closeOtpModal} 
           isModalOpen={this.state.otpModalIsOpen}
           className="otp-modal"
-          email={this.props.initialValues.email}
+          phoneNo={this.props.initialValues.mobilePhone}
         />
         <h3 className="text-center">Chama Administrator</h3>
         <h5 className="step-heading text-center mb-4">
@@ -189,13 +197,13 @@ const mapStateToProps = state => ({
   chamaDetailsSuccess: state.chamaDetails.stepSuccess,
   chamaDetailsSuccessMessage: state.chamaDetails.message,
   chamaDetailsAlreadySubmitted: state.chamaDetails.alreadySubmitted,
-  // group_id: state.chamaDetails.group.id,
+  group_id: state.chamaDetails.group.id,
   stepSuccess: state.chamaAdmin.stepSuccess,
   otpIsValid: state.chamaAdmin.otpIsValid,
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitAdmindetails: (values, group_id) => dispatch(submitChamaAdminDetails(values, group_id)),
+  submitAdminDetails: (values, group_id) => dispatch(submitChamaAdminDetails(values, group_id)),
   alreadySubmitted: () => dispatch(alreadySubmitted()),
 });
 

@@ -88,7 +88,7 @@ class ChamaDetails extends Component {
                 component={renderInputGroup}
                 type="number"
                 id="noOfMembers"
-                icon="fa fa-group"
+                icon="fas fa-users"
               />
             </Col>
           </Row>

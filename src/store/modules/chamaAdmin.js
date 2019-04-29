@@ -1,4 +1,6 @@
-import axios from '../../axios';
+import axios from 'axios';
+
+import { BASE_URL } from '../../constants';
 
 const SUBMIT_CHAMA_ADMIN_REQUEST = 'chama-app/SUBMIT_CHAMA_ADMIN_REQUEST';
 const SUBMIT_CHAMA_ADMIN_SUCCESS = 'chama-app/SUBMIT_CHAMA_ADMIN_SUCCESS';
@@ -15,7 +17,7 @@ const initialState = {
         firstName: 'Eric',
         lastName: 'Murimi',
         email: 'emurinyo@gmail.com',
-        mobilePhone: '0712883777',
+        mobilePhone: '254712883777',
         password: 'pass123',
         confirmPassword: 'pass123',
     },
@@ -88,8 +90,9 @@ export function submitChamaAdminDetails(adminDetails) {
         dispatch({ type: SUBMIT_CHAMA_ADMIN_REQUEST });
 
         try {
-            const response = axios.post('/register/admin', {
-                
+            const response = axios.post(`${BASE_URL}/register/admin`, { 
+              ...adminDetails,
+              password_confirmation: adminDetails.confirmPassword,
             });
 
             if (response.success) {

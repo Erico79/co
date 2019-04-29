@@ -1,6 +1,8 @@
 import React from "react";
 import { FormGroup, Label, Input } from "reactstrap";
 
+import './FormControls.sass';
+
 const renderFormGroup = props => {
   const {
     label,

@@ -29,10 +29,10 @@ export default class Registration extends Component {
   switchComponents() {
     switch(this.state.currentStep) {
       case 1:
-        return <ChamaDetails {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
+        return <ChamaDetails {...this.props} {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
 
       case 2:
-        return <ChamaAdmin {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
+        return <ChamaAdmin {...this.props} {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
 
       default:
         return null;

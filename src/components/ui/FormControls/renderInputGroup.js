@@ -1,6 +1,9 @@
 import React, { Fragment } from "react";
 import { Label, Input, InputGroup } from "reactstrap";
 
+import './FormControls.sass';
+import './renderInputGroup.sass';
+
 const renderInputGroup = props => {
   const {
     label,
