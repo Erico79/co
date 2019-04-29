@@ -49,7 +49,6 @@ const chamaDetailsReducer = (state = initialState, action) => {
         errorMessage: action.payload.errorMessage,
         error: action.payload.error,
         stepSuccess: false,
-        errors: {},
       };
 
     case SUBMIT_CHAMA_DETAILS_ERROR:
@@ -84,24 +83,24 @@ export function submitChamaDetails(chamaDetails, group_id) {
         group_id,
       });
 
-      if (response.data.success) {
-        dispatch({
-          type: SUBMIT_CHAMA_DETAILS_SUCCESS,
-          payload: {
-            data: chamaDetails,
-            message: "Chama Details have been saved.",
-            group: response.data.group,
-          }
-        });
-      } else {
+      dispatch({
+        type: SUBMIT_CHAMA_DETAILS_SUCCESS,
+        payload: {
+          data: chamaDetails,
+          message: "Chama Details have been saved.",
+          group: response.data.group,
+        }
+      });
+    } catch (e) {
+      if (e.response && e.response.data.errors) {
         dispatch({
           type: SUBMIT_CHAMA_DETAILS_ERROR,
           payload: {
-            errors: response.data.errors,
+            errors: e.response.data.errors,
           }
         });
       }
-    } catch (e) {
+
       dispatch({
         type: SUBMIT_CHAMA_DETAILS_FAILURE,
         payload: {

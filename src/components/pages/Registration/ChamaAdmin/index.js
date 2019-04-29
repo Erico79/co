@@ -10,6 +10,7 @@ import validate from "./validate";
 import { alreadySubmitted } from '../../../../store/modules/chamaDetails';
 import { submitChamaAdminDetails } from "../../../../store/modules/chamaAdmin";
 import OTPModal from './Modals/OTPModal';
+import { generateAccessToken } from "../../../../store/modules/auth";
 
 let options = {
   place: "tr",
@@ -28,9 +29,10 @@ class ChamaAdmin extends Component {
   }
 
   submit = async values => {
-    const { history, group_id, submitAdminDetails } = this.props;
+    const { history, group_id, submitAdminDetails, generateToken } = this.props;
 
     if (group_id) {
+      await generateToken(values.email, values.password);
       await submitAdminDetails(values, group_id);
       return this.openOTPModal();
     }
@@ -204,6 +206,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   submitAdminDetails: (values, group_id) => dispatch(submitChamaAdminDetails(values, group_id)),
+  generateToken: (email, password) => dispatch(generateAccessToken(email, password)),
   alreadySubmitted: () => dispatch(alreadySubmitted()),
 });
 
