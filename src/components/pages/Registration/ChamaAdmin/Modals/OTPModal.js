@@ -18,9 +18,15 @@ class OTPModal extends Component {
     phoneNo: PropTypes.string.isRequired,
   }
 
-  handleOTPChange = (event) => {
+  state = {
+    otp: null,
+  }
+
+  handleOTPChange = event => {
     if (!Number(event.target.value))
-      event.preventDefault();
+      return event.preventDefault();
+
+    this.setState({ otp: event.target.value });
   }
 
   render() {
@@ -42,6 +48,7 @@ class OTPModal extends Component {
               type="text"
               maxLength={4}
               onChange={this.handleOTPChange}
+              value={this.state.otp}
             />
           </ModalBody>
           <ModalFooter>

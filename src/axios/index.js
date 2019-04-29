@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ACCESS_TOKEN, BASE_URL } from "../constants";
+import { BASE_URL } from "../constants";
 
-const instance = axios.create({
+const instance = (accessToken) => axios.create({
     baseURL: BASE_URL,
     headers: {
       'Accept': 'application/json',
-      'Authorization': "Bearer " + ACCESS_TOKEN
+      'Authorization': `Bearer ${accessToken}`
     }
   });
 

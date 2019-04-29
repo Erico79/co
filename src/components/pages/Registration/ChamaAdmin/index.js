@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types'
 import { Row, Col, FormText, Form, Button } from "reactstrap";
-import { Field, reduxForm } from "redux-form";
+import { Field, reduxForm, SubmissionError } from "redux-form";
 import { connect } from "react-redux";
 import NotificationAlert from "react-notification-alert";
 
@@ -29,15 +29,41 @@ class ChamaAdmin extends Component {
   }
 
   submit = async values => {
-    const { history, group_id, submitAdminDetails, generateToken } = this.props;
+    const { group_id, submitAdminDetails, generateToken } = this.props;
+    const { email, password } = values;
 
     if (group_id) {
-      await generateToken(values.email, values.password);
       await submitAdminDetails(values, group_id);
-      return this.openOTPModal();
+      
+      if (this.props.stepSuccess) {
+        await generateToken(email, password);
+
+        if (this.props.accessToken)
+          return this.openOTPModal();
+      }
     }
     
-    history.push('/');
+    if (this.props.errors) {
+      const { email, first_name, last_name, mobile_phone, password, password_confirmation } = this.props.errors;
+
+      if (email) 
+        throw new SubmissionError({ email: email[0] })
+
+      if (first_name) 
+        throw new SubmissionError({ firstName: first_name[0] })
+
+      if (last_name) 
+        throw new SubmissionError({ lastName: last_name[0] })
+
+      if (mobile_phone) 
+        throw new SubmissionError({ mobilePhone: mobile_phone[0] })
+
+      if (mobile_phone) 
+        throw new SubmissionError({ password: password[0] })
+
+      if (password_confirmation) 
+        throw new SubmissionError({ confirmPassword: password_confirmation[0] })
+    }
   };
 
   validateEmailAndMobileNo = otp => {
@@ -202,6 +228,9 @@ const mapStateToProps = state => ({
   group_id: state.chamaDetails.group.id,
   stepSuccess: state.chamaAdmin.stepSuccess,
   otpIsValid: state.chamaAdmin.otpIsValid,
+  accessToken: state.auth.accessToken,
+  errors: state.chamaAdmin.errors,
+  errorMessage: state.chamaAdmin.errorMessage,
 });
 
 const mapDispatchToProps = dispatch => ({

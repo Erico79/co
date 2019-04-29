@@ -7,10 +7,7 @@ const SUBMIT_CHAMA_ADMIN_SUCCESS = "chama-app/SUBMIT_CHAMA_ADMIN_SUCCESS";
 const SUBMIT_CHAMA_ADMIN_FAILURE = "chama-app/SUBMIT_CHAMA_ADMIN_FAILURE";
 const SUBMIT_CHAMA_ADMIN_ERROR = "chama-app/SUBMIT_CHAMA_ADMIN_ERROR";
 const ALREADY_SUBMITTED = "chama-app/ALREADY_SUBMITTED";
-const OTP_REQUEST = "chama-app/OTP_REQUEST";
 const OTP_IS_VALID = "chama-app/OTP_IS_VALID";
-const OTP_IS_INVALID = "chama-app/OTP_IS_INVALID";
-const OTP_REQUEST_FAILURE = "chama-app/OTP_REQUEST_FAILURE";
 
 const initialState = {
   info: {
@@ -25,7 +22,7 @@ const initialState = {
   isLoading: false,
   errorMessage: "",
   alreadySubmitted: false,
-  errors: {},
+  errors: null,
   otpIsValid: false
 };
 
@@ -45,7 +42,7 @@ const chamaAdminReducer = (state = initialState, action) => {
         message: action.payload.message,
         stepSuccess: true,
         alreadySubmitted: false,
-        errors: {},
+        errors: null,
         errorMessage: ""
       };
 
@@ -98,7 +95,7 @@ export function submitChamaAdminDetails(adminDetails, group_id) {
     } = adminDetails;
 
     try {
-      const response = axios.post(`${BASE_URL}/register/admin`, {
+      await axios.post(`${BASE_URL}/register/admin`, {
         first_name: firstName,
         last_name: lastName,
         email,
@@ -108,23 +105,23 @@ export function submitChamaAdminDetails(adminDetails, group_id) {
         group_id
       });
 
-      if (response.success) {
-        dispatch({
-          type: SUBMIT_CHAMA_ADMIN_SUCCESS,
-          payload: {
-            data: adminDetails,
-            message: "Chama Details have been saved."
-          }
-        });
-      } else {
+      dispatch({
+        type: SUBMIT_CHAMA_ADMIN_SUCCESS,
+        payload: {
+          data: adminDetails,
+          message: "Chama Details have been saved."
+        }
+      });
+    } catch (e) {
+      if (e.response && e.response.status === 400) {
         dispatch({
           type: SUBMIT_CHAMA_ADMIN_ERROR,
           payload: {
-            errors: response.data.errors
+            errors: e.response.data.errors
           }
         });
       }
-    } catch (e) {
+
       dispatch({
         type: SUBMIT_CHAMA_ADMIN_FAILURE,
         payload: {
