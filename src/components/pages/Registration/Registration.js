@@ -34,6 +34,9 @@ export default class Registration extends Component {
       case 2:
         return <ChamaAdmin {...this.props} {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
 
+      case 3:
+        return <h1>Chama Accounts</h1>;
+
       default:
         return null;
     }

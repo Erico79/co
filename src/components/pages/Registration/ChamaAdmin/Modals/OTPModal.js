@@ -16,21 +16,32 @@ class OTPModal extends Component {
     closeModal: PropTypes.func.isRequired,
     isModalOpen: PropTypes.bool.isRequired,
     phoneNo: PropTypes.string.isRequired,
+    validateOTP: PropTypes.func.isRequired,
   }
 
   state = {
     otp: null,
   }
 
-  handleOTPChange = event => {
+  handleOTPChange = async event => {
     if (!Number(event.target.value))
       return event.preventDefault();
 
-    this.setState({ otp: event.target.value });
+    await this.setState({ otp: event.target.value });
+
+    const { otp } = this.state;
+    if (otp && otp.length === 4) {
+      await this.props.validateOTP(otp, this.props.accessToken);
+
+      if (this.props.validOTP) {
+        this.props.closeModal();
+        this.props.handleNext();        
+      }
+    }
   }
 
   render() {
-    const { closeModal, isModalOpen, phoneNo } = this.props;
+    const { closeModal, isModalOpen, phoneNo, error } = this.props;
 
     return (
       <div>
@@ -50,6 +61,7 @@ class OTPModal extends Component {
               onChange={this.handleOTPChange}
               value={this.state.otp}
             />
+            <div className="invalid-feedback">{error}</div>
           </ModalBody>
           <ModalFooter>
             <Button outline className="send-otp-btn pull-left btn-outline-primary">Resend Code</Button>

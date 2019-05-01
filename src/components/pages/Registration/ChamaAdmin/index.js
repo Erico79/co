@@ -10,7 +10,7 @@ import validate from "./validate";
 import { alreadySubmitted } from '../../../../store/modules/chamaDetails';
 import { submitChamaAdminDetails } from "../../../../store/modules/chamaAdmin";
 import OTPModal from './Modals/OTPModal';
-import { generateAccessToken } from "../../../../store/modules/auth";
+import { generateAccessToken, validateOTP } from "../../../../store/modules/auth";
 
 let options = {
   place: "tr",
@@ -27,6 +27,20 @@ class ChamaAdmin extends Component {
   state = {
     otpModalIsOpen: false,
   }
+
+  componentDidMount() {
+    if (this.props.chamaDetailsSuccess && !this.props.chamaDetailsAlreadySubmitted) {
+      options.message = (
+        <div>
+          <div>
+            <b>Success!</b> - {this.props.chamaDetailsSuccessMessage}
+          </div>
+        </div>
+      );
+      this.refs.notify.notificationAlert(options);
+      this.props.alreadySubmitted();
+    }
+  };
 
   submit = async values => {
     const { group_id, submitAdminDetails, generateToken } = this.props;
@@ -70,20 +84,6 @@ class ChamaAdmin extends Component {
     
   }
 
-  componentDidMount() {
-    if (this.props.chamaDetailsSuccess && !this.props.chamaDetailsAlreadySubmitted) {
-      options.message = (
-        <div>
-          <div>
-            <b>Success!</b> - {this.props.chamaDetailsSuccessMessage}
-          </div>
-        </div>
-      );
-      this.refs.notify.notificationAlert(options);
-      this.props.alreadySubmitted();
-    }
-  };
-
   openOTPModal = () => {
     this.setState({ otpModalIsOpen: true });
   }
@@ -103,6 +103,11 @@ class ChamaAdmin extends Component {
           isModalOpen={this.state.otpModalIsOpen}
           className="otp-modal"
           phoneNo={this.props.initialValues.mobilePhone}
+          validateOTP={this.props.validateOTP}
+          error={this.props.otp.errorMessage}
+          validOTP={this.props.otp.validOTP}
+          handleNext={this.props.handleNext}
+          accessToken={this.props.accessToken}
         />
         <h3 className="text-center">Chama Administrator</h3>
         <h5 className="step-heading text-center mb-4">
@@ -231,12 +236,14 @@ const mapStateToProps = state => ({
   accessToken: state.auth.accessToken,
   errors: state.chamaAdmin.errors,
   errorMessage: state.chamaAdmin.errorMessage,
+  otp: state.auth.otp,
 });
 
 const mapDispatchToProps = dispatch => ({
   submitAdminDetails: (values, group_id) => dispatch(submitChamaAdminDetails(values, group_id)),
   generateToken: (email, password) => dispatch(generateAccessToken(email, password)),
   alreadySubmitted: () => dispatch(alreadySubmitted()),
+  validateOTP: (otp, token) => dispatch(validateOTP(otp, token)),
 });
 
 export default connect(

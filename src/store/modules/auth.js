@@ -1,17 +1,30 @@
 import axios from 'axios';
+import tokenAxios from '../../axios';
 import {
   OAUTH_BASE_URL
 } from '../../constants';
 
-const GENERATE_ACCESS_TOKEN_REQUEST = "chama-app/GENERATE_ACCESS_TOKEN_REQUEST";
-const GENERATE_ACCESS_TOKEN_SUCCESS = "chama-app/GENERATE_ACCESS_TOKEN_SUCCESS";
-const GENERATE_ACCESS_TOKEN_FAILURE = "chama-app/GENERATE_ACCESS_TOKEN_FAILURE";
+const GENERATE_ACCESS_TOKEN_REQUEST = "@chama-app/GENERATE_ACCESS_TOKEN_REQUEST";
+const GENERATE_ACCESS_TOKEN_SUCCESS = "@chama-app/GENERATE_ACCESS_TOKEN_SUCCESS";
+const GENERATE_ACCESS_TOKEN_FAILURE = "@chama-app/GENERATE_ACCESS_TOKEN_FAILURE";
+const VALIDATE_OTP_REQUEST = '@chama-app/VALIDATE_OTP_REQUEST';
+const VALIDATE_OTP_SUCCESS = '@chama-app/VALIDATE_OTP_SUCCESS';
+const VALIDATE_OTP_FAILURE = '@chama-app/VALIDATE_OTP_FAILURE';
+
+const OTP_EXPIRED = 'OTP_EXPIRED';
+const OTP_IS_VALID = 'OTP_IS_VALID';
 
 const initialState = {
   isLoading: false,
   accessToken: null,
   expiresIn: null,
   refreshToken: null,
+  otp: {
+    validating: false,
+    valid: false,
+    errorMessage: null,
+    retries: null,
+  },
 };
 
 const {
@@ -42,6 +55,39 @@ const authReducer = (state = initialState, action) => {
         isLoading: false,
         errorMessage: action.payload.errorMessage,
         error: action.payload.error,
+      }
+
+    case VALIDATE_OTP_REQUEST:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          validating: true,
+        },
+      }
+
+    case VALIDATE_OTP_SUCCESS:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          validating: false,
+          valid: true,
+          errorMessage: null,
+        },
+      }
+
+    case VALIDATE_OTP_FAILURE:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          valid: false,
+          validating: false,
+          errorMessage: action.payload.errorMessage,
+          retries: action.payload.retries,
+        }
+
       }
 
     default:
@@ -75,6 +121,48 @@ export const generateAccessToken = (username, password) => async dispatch => {
         errorMessage: 'Encountered an error while generating access token',
         error: e
       }
+    });
+  }
+}
+
+export const validateOTP = (otp, token) => async dispatch => {
+  dispatch({ type: VALIDATE_OTP_REQUEST });
+
+  try {
+    const response = await tokenAxios(token).post('/validate/otp', { otp });
+
+    const { otp_status_code: otpStatus, retries } = response.data;
+
+    switch(otpStatus) {
+      case OTP_IS_VALID:
+        dispatch({
+          type: VALIDATE_OTP_SUCCESS,
+          payload: { validOTP: true },
+        });
+        break;
+
+      case OTP_EXPIRED:
+        dispatch({ 
+          type: VALIDATE_OTP_FAILURE,
+          payload: { 
+            errorMessage: 'OTP has expired',
+            retries,
+          },
+        });
+        break;
+
+      default:
+        break;
+    }
+      
+  } catch(e) {
+    dispatch({
+      type: VALIDATE_OTP_FAILURE,
+      payload: {
+        errorMessage: 'Invalid OTP',
+        error: e,
+        retries: e.response.data.retries,
+      },
     });
   }
 }
