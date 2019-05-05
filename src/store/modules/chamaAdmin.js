@@ -2,12 +2,14 @@ import axios from "axios";
 
 import { BASE_URL } from "../../constants";
 
-const SUBMIT_CHAMA_ADMIN_REQUEST = "chama-app/SUBMIT_CHAMA_ADMIN_REQUEST";
-const SUBMIT_CHAMA_ADMIN_SUCCESS = "chama-app/SUBMIT_CHAMA_ADMIN_SUCCESS";
-const SUBMIT_CHAMA_ADMIN_FAILURE = "chama-app/SUBMIT_CHAMA_ADMIN_FAILURE";
-const SUBMIT_CHAMA_ADMIN_ERROR = "chama-app/SUBMIT_CHAMA_ADMIN_ERROR";
-const ALREADY_SUBMITTED = "chama-app/ALREADY_SUBMITTED";
-const OTP_IS_VALID = "chama-app/OTP_IS_VALID";
+const SUBMIT_CHAMA_ADMIN_REQUEST = "@chama-app/SUBMIT_CHAMA_ADMIN_REQUEST";
+const SUBMIT_CHAMA_ADMIN_SUCCESS = "@chama-app/SUBMIT_CHAMA_ADMIN_SUCCESS";
+const SUBMIT_CHAMA_ADMIN_FAILURE = "@chama-app/SUBMIT_CHAMA_ADMIN_FAILURE";
+const SUBMIT_CHAMA_ADMIN_ERROR = "@chama-app/SUBMIT_CHAMA_ADMIN_ERROR";
+const ALREADY_SUBMITTED = "@chama-app/ALREADY_SUBMITTED";
+const OTP_IS_VALID = "@chama-app/OTP_IS_VALID";
+const ADMIN_ALREADY_EXISTS = "@chama-app/ADMIN_ALREADY_EXISTS";
+const ADMIN_EXISTS = "ADMIN_EXISTS";
 
 const initialState = {
   info: {
@@ -23,7 +25,8 @@ const initialState = {
   errorMessage: "",
   alreadySubmitted: false,
   errors: null,
-  otpIsValid: false
+  otpIsValid: false,
+  adminExists: false,
 };
 
 const chamaAdminReducer = (state = initialState, action) => {
@@ -43,7 +46,7 @@ const chamaAdminReducer = (state = initialState, action) => {
         stepSuccess: true,
         alreadySubmitted: false,
         errors: null,
-        errorMessage: ""
+        errorMessage: "",
       };
 
     case SUBMIT_CHAMA_ADMIN_FAILURE:
@@ -75,6 +78,17 @@ const chamaAdminReducer = (state = initialState, action) => {
         otpIsValid: true
       };
 
+    case ADMIN_ALREADY_EXISTS:
+      return {
+        ...state,
+        adminExists: true,
+        isLoading: false,
+        info: {
+          ...state.info,
+          mobilePhone: action.payload.mobilePhone,
+        }
+      }
+
     default:
       return state;
   }
@@ -95,7 +109,7 @@ export function submitChamaAdminDetails(adminDetails, group_id) {
     } = adminDetails;
 
     try {
-      await axios.post(`${BASE_URL}/register/admin`, {
+      const response = await axios.post(`${BASE_URL}/register/admin`, {
         first_name: firstName,
         last_name: lastName,
         email,
@@ -104,6 +118,13 @@ export function submitChamaAdminDetails(adminDetails, group_id) {
         mobile_phone: mobilePhone,
         group_id
       });
+
+      if (response.data.error_code && response.data.error_code === ADMIN_EXISTS) {
+        return dispatch({
+          type: ADMIN_ALREADY_EXISTS,
+          payload: { mobilePhone },
+        })
+      }
 
       dispatch({
         type: SUBMIT_CHAMA_ADMIN_SUCCESS,

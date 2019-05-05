@@ -10,6 +10,10 @@ const GENERATE_ACCESS_TOKEN_FAILURE = "@chama-app/GENERATE_ACCESS_TOKEN_FAILURE"
 const VALIDATE_OTP_REQUEST = '@chama-app/VALIDATE_OTP_REQUEST';
 const VALIDATE_OTP_SUCCESS = '@chama-app/VALIDATE_OTP_SUCCESS';
 const VALIDATE_OTP_FAILURE = '@chama-app/VALIDATE_OTP_FAILURE';
+const VALIDATE_OTP_EXPIRED = '@chama-app/VALIDATE_OTP_EXPIRED';
+const RESEND_OTP_REQUEST = '@chama-app/RESEND_OTP_REQUEST';
+const RESEND_OTP_SUCCESS = '@chama-app/RESEND_OTP_SUCCESS';
+const RESEND_OTP_FAILURE = '@chama-app/RESEND_OTP_FAILURE';
 
 const OTP_EXPIRED = 'OTP_EXPIRED';
 const OTP_IS_VALID = 'OTP_IS_VALID';
@@ -24,6 +28,7 @@ const initialState = {
     valid: false,
     errorMessage: null,
     retries: null,
+    resending: false,
   },
 };
 
@@ -87,7 +92,46 @@ const authReducer = (state = initialState, action) => {
           errorMessage: action.payload.errorMessage,
           retries: action.payload.retries,
         }
+      }
 
+    case VALIDATE_OTP_EXPIRED:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          valid: false,
+          validating: false,
+          errorMessage: action.payload.errorMessage,
+          retries: action.payload.retries,
+        }
+      }
+
+    case RESEND_OTP_REQUEST:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          resending: true,
+        }
+      }
+
+    case RESEND_OTP_SUCCESS:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          resending: false,
+        }
+      }
+
+    case RESEND_OTP_FAILURE:
+      return {
+        ...state,
+        otp: {
+          ...state.otp,
+          resending: false,
+          errorMessage: action.payload.errorMessage,
+        }
       }
 
     default:
@@ -125,6 +169,21 @@ export const generateAccessToken = (username, password) => async dispatch => {
   }
 }
 
+export const resendOTP = (mobilePhone, token) => async dispatch => {
+  dispatch({ type: RESEND_OTP_REQUEST });
+  try {
+    await tokenAxios(token).post(`/resend/otp/${mobilePhone}`);
+    dispatch({ type: RESEND_OTP_SUCCESS });
+  } catch(e) {
+    dispatch({ 
+      type: RESEND_OTP_FAILURE, 
+      payload: {
+        errorMessage: 'Encountered an error while resending code',
+      }
+    });
+  }
+}
+
 export const validateOTP = (otp, token) => async dispatch => {
   dispatch({ type: VALIDATE_OTP_REQUEST });
 
@@ -143,7 +202,7 @@ export const validateOTP = (otp, token) => async dispatch => {
 
       case OTP_EXPIRED:
         dispatch({ 
-          type: VALIDATE_OTP_FAILURE,
+          type: VALIDATE_OTP_EXPIRED,
           payload: { 
             errorMessage: 'OTP has expired',
             retries,

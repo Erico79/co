@@ -24,7 +24,7 @@ class OTPModal extends Component {
   }
 
   handleOTPChange = async event => {
-    if (!Number(event.target.value))
+    if (!Number(event.target.value) || event.target.value.length > 4)
       return event.preventDefault();
 
     await this.setState({ otp: event.target.value });
@@ -40,8 +40,12 @@ class OTPModal extends Component {
     }
   }
 
+  resendOTP = async () => {
+    await this.props.resendOTP(this.props.phoneNo, this.props.accessToken);
+  }
+
   render() {
-    const { closeModal, isModalOpen, phoneNo, error } = this.props;
+    const { closeModal, isModalOpen, phoneNo, error, otp: { resending } } = this.props;
 
     return (
       <div>
@@ -57,17 +61,20 @@ class OTPModal extends Component {
               placeholder="Enter the Code here"
               className="otp-input"
               type="text"
-              maxLength={4}
               onChange={this.handleOTPChange}
               value={this.state.otp}
             />
             <div className="invalid-feedback">{error}</div>
           </ModalBody>
           <ModalFooter>
-            <Button outline className="send-otp-btn pull-left btn-outline-primary">Resend Code</Button>
+            <Button 
+              outline 
+              className="send-otp-btn pull-left btn-outline-primary"
+              onClick={this.resendOTP}
+              disabled={resending}
+              >Resend Code</Button>
             <div className="pull-right">
-                <Button color="secondary" className="cancel-otp-btn" onClick={closeModal}>Cancel</Button>
-                <Button color="primary" className="submit-otp-btn">Continue</Button>
+                <Button color="secondary" className="cancel-otp-btn" onClick={closeModal}>Close</Button>
             </div>
           </ModalFooter>
         </Modal>

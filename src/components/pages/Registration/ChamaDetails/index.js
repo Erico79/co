@@ -103,8 +103,10 @@ class ChamaDetails extends Component {
                 disabled={this.props.isLoading}
               >
                 Next{" "}
-                {this.props.isLoading && (
-                  <i className="fa fa-circle-o-notch fa-spin" />
+                {!this.props.isLoading ? (
+                  <i className="fas fa-arrow-right" />
+                ) : (
+                  <i className="fas fa-circle-o-notch fa-spin" />
                 )}
               </Button>
             </Col>

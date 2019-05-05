@@ -10,7 +10,11 @@ import validate from "./validate";
 import { alreadySubmitted } from '../../../../store/modules/chamaDetails';
 import { submitChamaAdminDetails } from "../../../../store/modules/chamaAdmin";
 import OTPModal from './Modals/OTPModal';
-import { generateAccessToken, validateOTP } from "../../../../store/modules/auth";
+import { 
+  generateAccessToken, 
+  validateOTP,
+  resendOTP 
+} from "../../../../store/modules/auth";
 
 let options = {
   place: "tr",
@@ -48,8 +52,8 @@ class ChamaAdmin extends Component {
 
     if (group_id) {
       await submitAdminDetails(values, group_id);
-      
-      if (this.props.stepSuccess) {
+
+      if (this.props.adminExists || this.props.stepSuccess) {
         await generateToken(email, password);
 
         if (this.props.accessToken)
@@ -60,23 +64,15 @@ class ChamaAdmin extends Component {
     if (this.props.errors) {
       const { email, first_name, last_name, mobile_phone, password, password_confirmation } = this.props.errors;
 
-      if (email) 
-        throw new SubmissionError({ email: email[0] })
-
-      if (first_name) 
-        throw new SubmissionError({ firstName: first_name[0] })
-
-      if (last_name) 
-        throw new SubmissionError({ lastName: last_name[0] })
-
-      if (mobile_phone) 
-        throw new SubmissionError({ mobilePhone: mobile_phone[0] })
-
-      if (mobile_phone) 
-        throw new SubmissionError({ password: password[0] })
-
-      if (password_confirmation) 
-        throw new SubmissionError({ confirmPassword: password_confirmation[0] })
+      if (email)
+        throw new SubmissionError({ 
+          email: email[0],
+          firstName: (first_name && first_name[0]) ? first_name[0] : null,
+          lastName: (last_name && last_name[0]) ? last_name[0] : null,
+          mobilePhone: (mobile_phone && mobile_phone[0]) ? mobile_phone[0] : null,
+          password: (password && password[0]) ? password[0] : null,
+          confirmPassword: (password_confirmation && password_confirmation[0]) ? password_confirmation[0] : null,
+        });
     }
   };
 
@@ -105,9 +101,11 @@ class ChamaAdmin extends Component {
           phoneNo={this.props.initialValues.mobilePhone}
           validateOTP={this.props.validateOTP}
           error={this.props.otp.errorMessage}
-          validOTP={this.props.otp.validOTP}
+          validOTP={this.props.otp.valid}
           handleNext={this.props.handleNext}
           accessToken={this.props.accessToken}
+          resendOTP={this.props.resendOTP}
+          otp={this.props.otp}
         />
         <h3 className="text-center">Chama Administrator</h3>
         <h5 className="step-heading text-center mb-4">
@@ -206,9 +204,9 @@ class ChamaAdmin extends Component {
               >
                 Next{" "}
                 {!this.props.isLoading ? (
-                  <i className="fa fa-arrow-right" />
+                  <i className="fas fa-arrow-right" />
                 ) : (
-                  <i className="fa fa-circle-o-notch fa-spin" />
+                  <i className="fal fa-circle-o-notch fa-spin" />
                 )}
               </Button>
             </Col>
@@ -236,6 +234,7 @@ const mapStateToProps = state => ({
   accessToken: state.auth.accessToken,
   errors: state.chamaAdmin.errors,
   errorMessage: state.chamaAdmin.errorMessage,
+  adminExists: state.chamaAdmin.adminExists,
   otp: state.auth.otp,
 });
 
@@ -244,6 +243,7 @@ const mapDispatchToProps = dispatch => ({
   generateToken: (email, password) => dispatch(generateAccessToken(email, password)),
   alreadySubmitted: () => dispatch(alreadySubmitted()),
   validateOTP: (otp, token) => dispatch(validateOTP(otp, token)),
+  resendOTP: (mobilePhone, token) => dispatch(resendOTP(mobilePhone, token)),
 });
 
 export default connect(
