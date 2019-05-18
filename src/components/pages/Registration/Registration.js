@@ -5,6 +5,8 @@ import ChamaDetails from "./ChamaDetails";
 import ChamaAdmin from "./ChamaAdmin";
 
 import "./Registration.sass";
+import ChamaAccounts from "./ChamaAccounts";
+import Review from "./Review";
 
 export default class Registration extends Component {
   constructor(props) {
@@ -29,13 +31,16 @@ export default class Registration extends Component {
   switchComponents() {
     switch(this.state.currentStep) {
       case 1:
-        return <ChamaDetails {...this.props} {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
+        return <ChamaDetails {...this.props} {...this.state} handleNext={this.handleNext} />;
 
       case 2:
         return <ChamaAdmin {...this.props} {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
 
       case 3:
-        return <h1>Chama Accounts</h1>;
+        return <ChamaAccounts {...this.props} {...this.state} handleBack={this.handleBack} handleNext={this.handleNext} />;
+
+      case 4:
+        return <Review {...this.props} {...this.state} handleBack={this.handleBack} />;
 
       default:
         return null;
