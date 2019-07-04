@@ -1,5 +1,11 @@
-h1, h2, h3, h4, h5, h6
-  font-weight: normal
+@import '../../../styles/variables.sass'
+.RegistrationWizard 
+  h1
+    @media screen and (max-width: $mobile)
+      font-size: 1.8rem
 
-.step-heading
-  margin-bottom: 40px
+  h1, h2, h3, h4, h5, h6
+    font-weight: normal
+
+  .step-heading
+    margin-bottom: 40px
