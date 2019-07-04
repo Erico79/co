@@ -65,7 +65,7 @@ class ChamaDetails extends Component {
       <div className="ChamaDetails">
         <NotificationAlert ref="notify" />
         <h3 className="text-center">Chama Details</h3>
-        <h5 className="step-heading text-center mb-4">
+        <h5 className="step-heading text-center">
           <span className="step-number">
             Step <strong>1</strong> / 4
           </span>

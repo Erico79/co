@@ -51,7 +51,7 @@ export default class Registration extends Component {
 
     return (
       <div className="RegistrationWizard">
-        <h2 className="text-center font-weight-bold">Register your Chama</h2>
+        <h1 className="text-center">Register your Chama</h1>
           <Steps 
             currentStep={this.state.currentStep}
           />
