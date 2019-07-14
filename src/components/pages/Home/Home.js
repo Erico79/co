@@ -12,7 +12,7 @@ const home = props => {
       <Jumbotron className="text-center">
         <img src={groupImage} className="mb-3" height="250" alt="Chama Group" />
         <h3 className="display-6">Welcome to Chama App</h3>
-        <p className="lead">This is a platform for Chamas</p>
+        <p className="lead">The smartest way to manage your Chama.</p>
         <hr className="my-4" />
         <p>Want to Register and move your Chama online?</p>
         <Row>
