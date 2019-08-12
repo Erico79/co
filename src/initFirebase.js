@@ -9,5 +9,4 @@ firebase.initializeApp({
   projectId: PROJECT_ID,
 });
 
-const db = firebase.firestore();
-export default db;
+export default firebase;

@@ -38,12 +38,16 @@ class ChamaAdmin extends Component {
   }
 
   sendOTP = async values => {
-    await this.props.sendOTP(values.mobilePhone);
+    if (values.mobilePhone !== this.props.initialValues.mobilePhone) {
+      await this.props.sendOTP(values.mobilePhone);
     
-    if (this.props.otp.errorMessage)
-      return this.setState({ successAlertVisible: false, errorAlertVisible: true });
+      if (this.props.otp.errorMessage)
+        return this.setState({ successAlertVisible: false, errorAlertVisible: true });
 
-    this.openOTPModal();
+      this.openOTPModal();
+    } else {
+      this.submitAdminInfo();
+    }
   };
 
   openOTPModal = () => {
@@ -65,28 +69,32 @@ class ChamaAdmin extends Component {
   validateOTPAndSaveAdmin = async (otp, mobilePhone) => {
     await this.props.validateOTP(otp, mobilePhone);
 
-    if (this.props.otp.valid) {
-      await this.props.submitAdminDetails(this.props.adminDetails, this.props.chamaDetails);
+    if (this.props.otp.valid) 
+      this.submitAdminInfo();
+  }
 
-      this.closeOtpModal();
-      this.onDismissErrorAlert();
-      this.onDismissSuccessAlert();
+  submitAdminInfo = async () => {
+    await this.props.submitAdminDetails(this.props.adminDetails, this.props.chamaDetails);
 
-      if (this.props.stepSuccess)
-        return this.props.handleNext();
+    this.closeOtpModal();
+    this.onDismissErrorAlert();
+    this.onDismissSuccessAlert();
 
-      if (this.props.errors) {
-        const { email, mobilePhone } = this.props.errors;
-        const emailError = (email && email[0]) ? email[0] : null;
-        const phoneError = (mobilePhone && mobilePhone[0]) ? mobilePhone[0] : null;
-  
-        this.props.throwFormError('email', emailError);
-        this.props.throwFormError('mobilePhone', phoneError);
-      }
-  
-      if (this.props.errorMessage)
-        this.setState({ errorAlertVisible: true });
+    if (this.props.stepSuccess)
+      return this.props.handleNext();
+
+    if (this.props.errors) {
+      const { email, mobilePhone } = this.props.errors;
+
+      if (email && email[0])
+        this.props.throwFormError('email', email[0]);
+
+      if (mobilePhone && mobilePhone[0])
+        this.props.throwFormError('mobilePhone', mobilePhone[0]);
     }
+
+    if (this.props.errorMessage)
+      this.setState({ errorAlertVisible: true });
   }
 
   render() {

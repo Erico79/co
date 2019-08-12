@@ -24,6 +24,10 @@ class OTPModal extends Component {
     otp: '',
   }
 
+  componentWillUnmount() {
+    this.setState({ otp: '' });
+  }
+
   handleOTPChange = async event => {
     console.log('otp', event.target.value);
     // if (!Number(event.target.value) || event.target.value.length > 4)
