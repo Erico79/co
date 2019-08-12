@@ -5,37 +5,28 @@ import { Col, Row, Form, Button } from "reactstrap";
 import NotificationAlert from 'react-notification-alert';
 
 import renderFormGroup from "../../../ui/FormControls/renderFormGroup";
-import { submitChamaDetails } from "../../../../store/modules/chamaDetails";
+import { checkIfChamaExists } from "../../../../store/modules/chamaDetails";
 import "./ChamaDetails.sass";
 import renderInputGroup from "../../../ui/FormControls/renderInputGroup";
 import validate from "./validate";
 
 class ChamaDetails extends Component {
   submit = async values => {
-    const { submitChamaDetails, handleNext } = this.props;
+    const { handleNext } = this.props;
+    const { chamaName, noOfMembers } = this.props.initialValues;
 
-    if (this.props.initialValues !== values) {
-      if (this.props.group == null) {
-        await submitChamaDetails(values);
-      } else {
-        await submitChamaDetails(values, this.props.group.id);
-      }
-    }
+    // validate chama details before submission
+    if (!chamaName || 
+      (chamaName !== values.chamaName ||
+      noOfMembers !== values.noOfMembers)
+    )
+     await this.props.checkIfChamaExists(values);
 
     if (Object.keys(this.props.errors).length) {
-      const { name, no_of_members } = this.props.errors;
+      const { chamaName } = this.props.errors;
 
-      if (name) {
-        throw new SubmissionError({
-          chamaName: name,
-        });
-      }
-
-      if (no_of_members) {
-        throw new SubmissionError({
-          noOfMembers: no_of_members,
-        })
-      }
+      if (chamaName)
+        throw new SubmissionError({ chamaName });
     }
     
     if (this.props.stepSuccess) {
@@ -132,7 +123,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitChamaDetails: (values, groupId) => dispatch(submitChamaDetails(values, groupId)),
+  checkIfChamaExists: chamaDetails => dispatch(checkIfChamaExists(chamaDetails)),
 });
 
 ChamaDetails = connect(

@@ -1,6 +1,5 @@
-import axios from "axios";
-
-import { BASE_URL } from "../../constants";
+import db from "../../initFirestore";
+import firebase from 'firebase';
 
 const SUBMIT_CHAMA_ADMIN_REQUEST = "@chama-app/SUBMIT_CHAMA_ADMIN_REQUEST";
 const SUBMIT_CHAMA_ADMIN_SUCCESS = "@chama-app/SUBMIT_CHAMA_ADMIN_SUCCESS";
@@ -9,14 +8,14 @@ const SUBMIT_CHAMA_ADMIN_ERROR = "@chama-app/SUBMIT_CHAMA_ADMIN_ERROR";
 const ALREADY_SUBMITTED = "@chama-app/ALREADY_SUBMITTED";
 const OTP_IS_VALID = "@chama-app/OTP_IS_VALID";
 const ADMIN_ALREADY_EXISTS = "@chama-app/ADMIN_ALREADY_EXISTS";
-const ADMIN_EXISTS = "ADMIN_EXISTS";
+const ADMIN_EXISTS = "already-exists";
 
 const initialState = {
   info: {
     firstName: "Eric",
     lastName: "Murimi",
     email: "emurinyo@gmail.com",
-    mobilePhone: "254712883777",
+    mobilePhone: "+254712883777",
     password: "pass123",
     confirmPassword: "pass123"
   },
@@ -95,52 +94,44 @@ const chamaAdminReducer = (state = initialState, action) => {
 };
 
 // action creators
-export function submitChamaAdminDetails(adminDetails, group_id) {
+export function submitChamaAdminDetails(adminDetails, chamaDetails) {
   return async dispatch => {
     dispatch({ type: SUBMIT_CHAMA_ADMIN_REQUEST });
 
-    const {
-      firstName,
-      lastName,
-      email,
-      mobilePhone,
-      password,
-      confirmPassword
-    } = adminDetails;
-
     try {
-      const response = await axios.post(`${BASE_URL}/register/admin`, {
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        password,
-        password_confirmation: confirmPassword,
-        mobile_phone: mobilePhone,
-        group_id
-      });
+        const registerAdmin = firebase.functions().httpsCallable('registerGroupAndAdmin');
+        await registerAdmin({ ...adminDetails, ...chamaDetails });
 
-      if (response.data.error_code && response.data.error_code === ADMIN_EXISTS) {
-        return dispatch({
-          type: ADMIN_ALREADY_EXISTS,
-          payload: { mobilePhone },
-        })
-      }
-
-      dispatch({
-        type: SUBMIT_CHAMA_ADMIN_SUCCESS,
-        payload: {
-          data: adminDetails,
-          message: "Chama Details have been saved."
-        }
-      });
-    } catch (e) {
-      if (e.response && e.response.status === 400) {
         dispatch({
-          type: SUBMIT_CHAMA_ADMIN_ERROR,
+          type: SUBMIT_CHAMA_ADMIN_SUCCESS,
           payload: {
-            errors: e.response.data.errors
+            data: adminDetails,
+            message: "Chama Admin has been registered."
           }
         });
+    } catch (e) {
+      if (e.code && e.code === 'invalid-argument') {
+        return dispatch({
+          type: SUBMIT_CHAMA_ADMIN_ERROR,
+          payload: {
+            errors: e,
+          }
+        });
+      }
+
+      if (e.details && e.details.code) {
+        const inputErrors = {};
+
+        if (e.details.code === 'auth/email-already-exists')
+          inputErrors.email = [e.details.message];
+
+        if (e.details.code === 'auth/phone-number-already-exists')
+          inputErrors.mobilePhone = [e.details.message];
+
+        return dispatch({ 
+          type: SUBMIT_CHAMA_ADMIN_ERROR, payload: { 
+          errors: inputErrors
+        }});
       }
 
       dispatch({

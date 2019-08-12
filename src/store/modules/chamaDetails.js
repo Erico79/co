@@ -1,12 +1,11 @@
-import axios from 'axios';
-
-import { BASE_URL } from '../../constants';
+import firebase from 'firebase';
 
 const SUBMIT_CHAMA_DETAILS_REQUEST = "chama-app/SUBMIT_CHAMA_DETAILS_REQUEST";
 const SUBMIT_CHAMA_DETAILS_SUCCESS = "chama-app/SUBMIT_CHAMA_DETAILS_SUCCESS";
 const SUBMIT_CHAMA_DETAILS_FAILURE = "chama-app/SUBMIT_CHAMA_DETAILS_FAILURE";
 const SUBMIT_CHAMA_DETAILS_ERROR = "chama-app/SUBMIT_CHAMA_DETAILS_ERROR";
 const ALREADY_SUBMITTED = "chama-app/ALREADY_SUBMITTED";
+const ADMIN_EXISTS = "already-exists";
 
 const initialState = {
   isLoading: false,
@@ -17,7 +16,7 @@ const initialState = {
   },
   stepSuccess: false,
   alreadySubmitted: false,
-  group: null,
+  groupId: null,
   errors: {},
 };
 
@@ -33,10 +32,8 @@ const chamaDetailsReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        info: action.payload.data,
-        message: action.payload.message,
+        info: action.payload,
         stepSuccess: true,
-        group: action.payload.group,
         alreadySubmitted: false,
         errors: {},
         errorMessage: ''
@@ -55,7 +52,7 @@ const chamaDetailsReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        errors: action.payload.errors,
+        errors: action.payload,
         stepSuccess: false,
       };
 
@@ -71,45 +68,37 @@ const chamaDetailsReducer = (state = initialState, action) => {
 };
 
 // action creators
-export function submitChamaDetails(chamaDetails, group_id) {
-  return async (dispatch) => {
-    dispatch({ type: SUBMIT_CHAMA_DETAILS_REQUEST });
+export const checkIfChamaExists = (chamaDetails) => async dispatch => {
+  dispatch({ type: SUBMIT_CHAMA_DETAILS_REQUEST });
 
-    try {
-      const { chamaName, noOfMembers } = chamaDetails;
-      const response = await axios.post(`${BASE_URL}/register/group`, {
-        name: chamaName,
-        no_of_members: noOfMembers,
-        group_id,
-      });
+  try {
+    const dedupGroup = firebase.functions().httpsCallable('dedupGroup');
+    await dedupGroup(chamaDetails);
 
-      dispatch({
-        type: SUBMIT_CHAMA_DETAILS_SUCCESS,
+    dispatch({
+      type: SUBMIT_CHAMA_DETAILS_SUCCESS,
+      payload: {
+        ...chamaDetails,
+      },
+    });
+  } catch(e) {
+    if (e.code && e.code === ADMIN_EXISTS) {
+      dispatch({ 
+        type: SUBMIT_CHAMA_DETAILS_ERROR, 
         payload: {
-          data: chamaDetails,
-          message: "Chama Details have been saved.",
-          group: response.data.group,
-        }
-      });
-    } catch (e) {
-      if (e.response && e.response.data.errors) {
-        dispatch({
-          type: SUBMIT_CHAMA_DETAILS_ERROR,
-          payload: {
-            errors: e.response.data.errors,
-          }
-        });
-      }
-
-      dispatch({
-        type: SUBMIT_CHAMA_DETAILS_FAILURE,
-        payload: {
-          errorMessage: "Encountered an error while saving chama details!",
-          error: e
+          chamaName: "A Chama with the same name already exists",
         }
       });
     }
-  };
+
+    dispatch({
+      type: SUBMIT_CHAMA_DETAILS_FAILURE,
+      payload: {
+        errorMessage: "Encountered an error while saving chama details!",
+        error: e
+      }
+    });
+  }
 }
 
 export function alreadySubmitted() {

@@ -11,7 +11,7 @@ const validate = values => {
 
   if (isNaN(noOfMembers)) errors.noOfMembers = "Please enter a number!";
   else if (noOfMembers < 2)
-    errors.noOfMembers = "You chama must have at least 2 members!";
+    errors.noOfMembers = "Your chama must have at least 2 members!";
   else if (parseInt(noOfMembers) !== Number(noOfMembers)) {
     errors.noOfMembers = "Enter integers only!";
   }

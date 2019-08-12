@@ -1,77 +1,36 @@
-import axios from 'axios';
-import tokenAxios from '../../axios';
-import {
-  OAUTH_BASE_URL
-} from '../../constants';
+import firebase from 'firebase';
 
-const GENERATE_ACCESS_TOKEN_REQUEST = "@chama-app/GENERATE_ACCESS_TOKEN_REQUEST";
-const GENERATE_ACCESS_TOKEN_SUCCESS = "@chama-app/GENERATE_ACCESS_TOKEN_SUCCESS";
-const GENERATE_ACCESS_TOKEN_FAILURE = "@chama-app/GENERATE_ACCESS_TOKEN_FAILURE";
 const VALIDATE_OTP_REQUEST = '@chama-app/VALIDATE_OTP_REQUEST';
-const VALIDATE_OTP_SUCCESS = '@chama-app/VALIDATE_OTP_SUCCESS';
 const VALIDATE_OTP_FAILURE = '@chama-app/VALIDATE_OTP_FAILURE';
-const VALIDATE_OTP_EXPIRED = '@chama-app/VALIDATE_OTP_EXPIRED';
-const RESEND_OTP_REQUEST = '@chama-app/RESEND_OTP_REQUEST';
-const RESEND_OTP_SUCCESS = '@chama-app/RESEND_OTP_SUCCESS';
-const RESEND_OTP_FAILURE = '@chama-app/RESEND_OTP_FAILURE';
-
-const OTP_EXPIRED = 'OTP_EXPIRED';
+const SEND_OTP_REQUEST = '@chama-app/SEND_OTP_REQUEST';
+const SEND_OTP_SUCCESS = '@chama-app/SEND_OTP_SUCCESS';
+const SEND_OTP_FAILURE = '@chama-app/SEND_OTP_FAILURE';
 const OTP_IS_VALID = 'OTP_IS_VALID';
 
 const initialState = {
   isLoading: false,
-  accessToken: null,
-  expiresIn: null,
-  refreshToken: null,
   otp: {
     validating: false,
     valid: false,
     errorMessage: null,
     retries: null,
-    resending: false,
+    sending: false,
   },
 };
 
-const {
-  REACT_APP_CLIENT_ID: client_id,
-  REACT_APP_CLIENT_SECRET: client_secret
-} = process.env;
-
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
-    case GENERATE_ACCESS_TOKEN_REQUEST:
-      return {
-        ...state,
-        isLoading: true,
-      }
-
-    case GENERATE_ACCESS_TOKEN_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        accessToken: action.payload.access_token,
-        expiresIn: action.payload.expires_in,
-        refreshToken: action.payload.refresh_token,
-      }
-      
-    case GENERATE_ACCESS_TOKEN_FAILURE:
-      return {
-        ...state,
-        isLoading: false,
-        errorMessage: action.payload.errorMessage,
-        error: action.payload.error,
-      }
-
     case VALIDATE_OTP_REQUEST:
       return {
         ...state,
         otp: {
           ...state.otp,
           validating: true,
+          errorMessage: null,
         },
       }
 
-    case VALIDATE_OTP_SUCCESS:
+    case OTP_IS_VALID:
       return {
         ...state,
         otp: {
@@ -90,46 +49,35 @@ const authReducer = (state = initialState, action) => {
           valid: false,
           validating: false,
           errorMessage: action.payload.errorMessage,
-          retries: action.payload.retries,
         }
       }
 
-    case VALIDATE_OTP_EXPIRED:
+    case SEND_OTP_REQUEST:
       return {
         ...state,
         otp: {
           ...state.otp,
-          valid: false,
-          validating: false,
-          errorMessage: action.payload.errorMessage,
-          retries: action.payload.retries,
+          sending: true,
+          errorMessage: null,
         }
       }
 
-    case RESEND_OTP_REQUEST:
+    case SEND_OTP_SUCCESS:
       return {
         ...state,
         otp: {
           ...state.otp,
-          resending: true,
+          sending: false,
+          errorMessage: null,
         }
       }
 
-    case RESEND_OTP_SUCCESS:
+    case SEND_OTP_FAILURE:
       return {
         ...state,
         otp: {
           ...state.otp,
-          resending: false,
-        }
-      }
-
-    case RESEND_OTP_FAILURE:
-      return {
-        ...state,
-        otp: {
-          ...state.otp,
-          resending: false,
+          sending: false,
           errorMessage: action.payload.errorMessage,
         }
       }
@@ -140,87 +88,41 @@ const authReducer = (state = initialState, action) => {
 };
 
 // action creators
-export const generateAccessToken = (username, password) => async dispatch => {
-  dispatch({
-    type: GENERATE_ACCESS_TOKEN_REQUEST
-  });
-
+export const sendOTP = mobilePhone => async dispatch => {
+  dispatch({ type: SEND_OTP_REQUEST });
+  
   try {
-    const response = await axios.post(`${OAUTH_BASE_URL}/oauth/token`, {
-      username,
-      password,
-      client_id: parseInt(client_id),
-      client_secret,
-      grant_type: "password",
-    });
+    const sendOTP = firebase.functions().httpsCallable('sendOTP');
+    await sendOTP({ mobilePhone });
 
-    dispatch({
-      type: GENERATE_ACCESS_TOKEN_SUCCESS,
-      payload: response.data,
-    });
-  } catch (e) {
-    dispatch({
-      type: GENERATE_ACCESS_TOKEN_FAILURE,
-      payload: {
-        errorMessage: 'Encountered an error while generating access token',
-        error: e
-      }
-    });
-  }
-}
-
-export const resendOTP = (mobilePhone, token) => async dispatch => {
-  dispatch({ type: RESEND_OTP_REQUEST });
-  try {
-    await tokenAxios(token).post(`/resend/otp/${mobilePhone}`);
-    dispatch({ type: RESEND_OTP_SUCCESS });
+    dispatch({ type: SEND_OTP_SUCCESS });
   } catch(e) {
     dispatch({ 
-      type: RESEND_OTP_FAILURE, 
+      type: SEND_OTP_FAILURE, 
       payload: {
-        errorMessage: 'Encountered an error while resending code',
+        errorMessage: 'Encountered an error while sending code',
       }
     });
   }
 }
 
-export const validateOTP = (otp, token) => async dispatch => {
+export const validateOTP = (otp, mobilePhone) => async dispatch => {
   dispatch({ type: VALIDATE_OTP_REQUEST });
 
   try {
-    const response = await tokenAxios(token).post('/validate/otp', { otp });
+    const validateOTP = firebase.functions().httpsCallable('validateOTP');
+    await validateOTP({ otp, mobilePhone });
 
-    const { otp_status_code: otpStatus, retries } = response.data;
-
-    switch(otpStatus) {
-      case OTP_IS_VALID:
-        dispatch({
-          type: VALIDATE_OTP_SUCCESS,
-          payload: { validOTP: true },
-        });
-        break;
-
-      case OTP_EXPIRED:
-        dispatch({ 
-          type: VALIDATE_OTP_EXPIRED,
-          payload: { 
-            errorMessage: 'OTP has expired',
-            retries,
-          },
-        });
-        break;
-
-      default:
-        break;
-    }
-      
+    dispatch({ type: OTP_IS_VALID });
   } catch(e) {
+    if (e.details)
+      return dispatch({ type: VALIDATE_OTP_FAILURE, payload:{ errorMessage: e.message } });
+
     dispatch({
       type: VALIDATE_OTP_FAILURE,
       payload: {
         errorMessage: 'Invalid OTP',
         error: e,
-        retries: e.response.data.retries,
       },
     });
   }

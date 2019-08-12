@@ -1,28 +1,26 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types'
-import { Row, Col, FormText, Form, Button } from "reactstrap";
-import { Field, reduxForm, SubmissionError } from "redux-form";
+import { Row, Col, FormText, Form, Button, Alert } from "reactstrap";
+import { 
+  Field, 
+  reduxForm,
+  formValueSelector, 
+  getFormValues, 
+  stopSubmit 
+} from "redux-form";
 import { connect } from "react-redux";
-import NotificationAlert from "react-notification-alert";
 
 import renderInputGroup from "../../../ui/FormControls/renderInputGroup";
 import validate from "./validate";
 import { alreadySubmitted } from '../../../../store/modules/chamaDetails';
 import { submitChamaAdminDetails } from "../../../../store/modules/chamaAdmin";
 import OTPModal from './Modals/OTPModal';
-import { 
-  generateAccessToken, 
+import {
   validateOTP,
-  resendOTP 
+  sendOTP
 } from "../../../../store/modules/auth";
+import "./ChamaAdmin.sass";
 
-let options = {
-  place: "tr",
-  type: "success",
-  icon: "fa fa-bell",
-  autoDismiss: 7,
-  closeButton: true
-};
 class ChamaAdmin extends Component {
   static propTypes = {
     history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
@@ -30,55 +28,23 @@ class ChamaAdmin extends Component {
 
   state = {
     otpModalIsOpen: false,
+    successAlertVisible: false,
+    errorAlertVisible: false,
   }
 
   componentDidMount() {
-    if (this.props.chamaDetailsSuccess && !this.props.chamaDetailsAlreadySubmitted) {
-      options.message = (
-        <div>
-          <div>
-            <b>Success!</b> - {this.props.chamaDetailsSuccessMessage}
-          </div>
-        </div>
-      );
-      this.refs.notify.notificationAlert(options);
-      this.props.alreadySubmitted();
-    }
-  };
-
-  submit = async values => {
-    const { group_id, submitAdminDetails, generateToken } = this.props;
-    const { email, password } = values;
-
-    if (group_id) {
-      await submitAdminDetails(values, group_id);
-
-      if (this.props.adminExists || this.props.stepSuccess) {
-        await generateToken(email, password);
-
-        if (this.props.accessToken)
-          return this.openOTPModal();
-      }
-    }
-    
-    if (this.props.errors) {
-      const { email, first_name, last_name, mobile_phone, password, password_confirmation } = this.props.errors;
-
-      if (email)
-        throw new SubmissionError({ 
-          email: email[0],
-          firstName: (first_name && first_name[0]) ? first_name[0] : null,
-          lastName: (last_name && last_name[0]) ? last_name[0] : null,
-          mobilePhone: (mobile_phone && mobile_phone[0]) ? mobile_phone[0] : null,
-          password: (password && password[0]) ? password[0] : null,
-          confirmPassword: (password_confirmation && password_confirmation[0]) ? password_confirmation[0] : null,
-        });
-    }
-  };
-
-  validateEmailAndMobileNo = otp => {
-    
+    if (this.props.chamaDetailsSuccess && !this.props.stepSuccess)
+      this.setState({ successAlertVisible: !this.state.successAlertVisible });
   }
+
+  sendOTP = async values => {
+    await this.props.sendOTP(values.mobilePhone);
+    
+    if (this.props.otp.errorMessage)
+      return this.setState({ successAlertVisible: false, errorAlertVisible: true });
+
+    this.openOTPModal();
+  };
 
   openOTPModal = () => {
     this.setState({ otpModalIsOpen: true });
@@ -88,32 +54,95 @@ class ChamaAdmin extends Component {
     this.setState({ otpModalIsOpen: false });
   }
 
+  onDismissSuccessAlert = () => {
+    this.setState({ successAlertVisible: false });
+  }
+
+  onDismissErrorAlert = () => {
+    this.setState({ errorAlertVisible: false });
+  }
+
+  validateOTPAndSaveAdmin = async (otp, mobilePhone) => {
+    await this.props.validateOTP(otp, mobilePhone);
+
+    if (this.props.otp.valid) {
+      await this.props.submitAdminDetails(this.props.adminDetails, this.props.chamaDetails);
+
+      this.closeOtpModal();
+      this.onDismissErrorAlert();
+      this.onDismissSuccessAlert();
+
+      if (this.props.stepSuccess)
+        return this.props.handleNext();
+
+      if (this.props.errors) {
+        const { email, mobilePhone } = this.props.errors;
+        const emailError = (email && email[0]) ? email[0] : null;
+        const phoneError = (mobilePhone && mobilePhone[0]) ? mobilePhone[0] : null;
+  
+        this.props.throwFormError('email', emailError);
+        this.props.throwFormError('mobilePhone', phoneError);
+      }
+  
+      if (this.props.errorMessage)
+        this.setState({ errorAlertVisible: true });
+    }
+  }
+
   render() {
-    const { handleSubmit, handleBack } = this.props;
+    const { handleSubmit, handleBack, chamaDetails: { chamaName } } = this.props;
 
     return (
       <div className="ChamaAdmin">
-        <NotificationAlert ref="notify" />
-        <OTPModal 
+        <Alert 
+          className="success-alert" 
+          color="info" 
+          isOpen={this.state.successAlertVisible} 
+          toggle={this.onDismissSuccessAlert}>
+          <h4 className="alert-heading">Well done!</h4>
+          <p>
+            The Chama name <strong>{chamaName}</strong> is available.
+          </p>
+          <hr />
+          <p className="mb-0">
+            Now fill in the <strong>Group Admin's</strong> information below.
+          </p>
+        </Alert>
+
+        <Alert 
+          className="success-alert" 
+          color="danger" 
+          isOpen={this.state.errorAlertVisible} 
+          toggle={this.onDismissErrorAlert}>
+          <h4 className="alert-heading">Uh oh!</h4>
+          <p>
+            Encountered an error while processing the information.
+          </p>
+          <hr />
+          <p className="mb-0">
+            Please try again later.
+          </p>
+        </Alert>
+
+        {this.props.mobilePhone ? <OTPModal 
           closeModal={this.closeOtpModal} 
+          sendOTP={this.props.sendOTP}
           isModalOpen={this.state.otpModalIsOpen}
           className="otp-modal"
-          phoneNo={this.props.initialValues.mobilePhone}
-          validateOTP={this.props.validateOTP}
+          phoneNo={this.props.mobilePhone}
+          validateOTP={this.validateOTPAndSaveAdmin}
           error={this.props.otp.errorMessage}
           validOTP={this.props.otp.valid}
           handleNext={this.props.handleNext}
-          accessToken={this.props.accessToken}
-          resendOTP={this.props.resendOTP}
           otp={this.props.otp}
-        />
+        /> : null}
         <h3 className="text-center">Chama Administrator</h3>
         <h5 className="step-heading text-center mb-4">
           <span className="step-number">
             Step <strong>2</strong> / 4
           </span>
         </h5>
-        <Form onSubmit={handleSubmit(this.submit)}>
+        <Form onSubmit={handleSubmit(this.sendOTP)}>
           <Row>
             <Col md="6">
               <Field
@@ -203,7 +232,7 @@ class ChamaAdmin extends Component {
                 className="btn-primary"
               >
                 Next{" "}
-                {!this.props.isLoading ? (
+                {!this.props.isLoading || !this.props.otp.sending ? (
                   <i className="fas fa-arrow-right" />
                 ) : (
                   <i className="fal fa-circle-o-notch fa-spin" />
@@ -226,9 +255,8 @@ const mapStateToProps = state => ({
   initialValues: state.chamaAdmin.info,
   isLoading: state.chamaAdmin.isLoading,
   chamaDetailsSuccess: state.chamaDetails.stepSuccess,
-  chamaDetailsSuccessMessage: state.chamaDetails.message,
   chamaDetailsAlreadySubmitted: state.chamaDetails.alreadySubmitted,
-  group_id: state.chamaDetails.group.id,
+  chamaDetails: state.chamaDetails.info,
   stepSuccess: state.chamaAdmin.stepSuccess,
   otpIsValid: state.chamaAdmin.otpIsValid,
   accessToken: state.auth.accessToken,
@@ -236,14 +264,18 @@ const mapStateToProps = state => ({
   errorMessage: state.chamaAdmin.errorMessage,
   adminExists: state.chamaAdmin.adminExists,
   otp: state.auth.otp,
+  groupId: state.chamaDetails.groupId,
+  mobilePhone: formValueSelector('chamaAdmin')(state, 'mobilePhone'),
+  adminDetails: getFormValues('chamaAdmin')(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitAdminDetails: (values, group_id) => dispatch(submitChamaAdminDetails(values, group_id)),
-  generateToken: (email, password) => dispatch(generateAccessToken(email, password)),
+  submitAdminDetails: (values, chamaDetails) => dispatch(submitChamaAdminDetails(values, chamaDetails)),
   alreadySubmitted: () => dispatch(alreadySubmitted()),
-  validateOTP: (otp, token) => dispatch(validateOTP(otp, token)),
-  resendOTP: (mobilePhone, token) => dispatch(resendOTP(mobilePhone, token)),
+  validateOTP: (otp, phoneNo) => dispatch(validateOTP(otp, phoneNo)),
+  sendOTP: phoneNo => dispatch(sendOTP(phoneNo)),
+  throwFormError: (fieldName, errorMessage) =>
+    dispatch(stopSubmit('chamaAdmin', { [fieldName]: errorMessage })),
 });
 
 export default connect(
