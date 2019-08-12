@@ -74,7 +74,19 @@ class ChamaAdmin extends Component {
   }
 
   submitAdminInfo = async () => {
-    await this.props.submitAdminDetails(this.props.adminDetails, this.props.chamaDetails);
+    const values = this.props.adminDetails;
+    const oldValues = this.props.initialValues;
+
+    if (values.firstName !== oldValues.firstName ||
+      values.lastName !== oldValues.lastName ||
+      values.email !== oldValues.email ||
+      values.mobilePhone !== oldValues.mobilePhone ||
+      values.password !== oldValues.password ||
+      values.confirmPassword !== oldValues.confirmPassword
+      )
+      await this.props.submitAdminDetails(values, this.props.chamaDetails);
+    else 
+      return this.props.handleNext();
 
     this.closeOtpModal();
     this.onDismissErrorAlert();

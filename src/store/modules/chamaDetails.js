@@ -5,6 +5,7 @@ const SUBMIT_CHAMA_DETAILS_SUCCESS = "chama-app/SUBMIT_CHAMA_DETAILS_SUCCESS";
 const SUBMIT_CHAMA_DETAILS_FAILURE = "chama-app/SUBMIT_CHAMA_DETAILS_FAILURE";
 const SUBMIT_CHAMA_DETAILS_ERROR = "chama-app/SUBMIT_CHAMA_DETAILS_ERROR";
 const ALREADY_SUBMITTED = "chama-app/ALREADY_SUBMITTED";
+const SET_GROUP_ID = "chama-app/SET_GROUP_ID";
 const ADMIN_EXISTS = "already-exists";
 
 const initialState = {
@@ -62,6 +63,12 @@ const chamaDetailsReducer = (state = initialState, action) => {
         alreadySubmitted: true
       };
 
+    case SET_GROUP_ID:
+      return {
+        ...state,
+        groupId: action.payload.groupId,
+      }
+
     default:
       return state;
   }
@@ -99,6 +106,10 @@ export const checkIfChamaExists = (chamaDetails) => async dispatch => {
       }
     });
   }
+}
+
+export const setGroupId = groupId => async dispatch => {
+  dispatch({ type: SET_GROUP_ID, payload: { groupId }})
 }
 
 export function alreadySubmitted() {

@@ -34,6 +34,10 @@ class Review extends Component {
     ]
   }
 
+  redirectToLogin() {
+    this.history.push('/login');
+  }
+
   render() {
     const { chamaName, noOfMembers } = this.props.chamaInfo;
     const { firstName, lastName, email, mobilePhone } = this.props.adminInfo;
@@ -99,7 +103,7 @@ class Review extends Component {
               </Col>
               <Col className="text-right">
                 <span className="text-muted">Contribution Amount</span>
-                <span className="font-weight-bold ml-2">{acc.contribution_amount}</span>
+                <span className="font-weight-bold ml-2">{acc.contributionAmount}</span>
               </Col>
             </Row>
           ))}
@@ -118,6 +122,7 @@ class Review extends Component {
             size="lg"
             disabled={this.props.isLoading}
             className="btn-success"
+            onClick={this.redirectToLogin}
           >
             Finish{" "}
             {!this.props.isLoading ? (
@@ -136,7 +141,7 @@ class Review extends Component {
 const mapStateToProps = state => ({
   chamaInfo: state.chamaDetails.info,
   adminInfo: state.chamaAdmin.info,
-  accountsInfo: state.chamaAccounts.info,
+  accountsInfo: state.chamaAccounts.info.accounts,
 })
 
 export default connect(mapStateToProps)(Review);

@@ -16,7 +16,7 @@ import { submitChamaAccounts } from '../../../../store/modules/chamaAccounts';
 
 class ChamaAccounts extends Component {
   state = {
-    accounts: [{}],
+    accounts: this.props.initialValues.accounts,
     maxNoOfAccounts: 5,
   }
 
@@ -36,8 +36,7 @@ class ChamaAccounts extends Component {
   }
 
   submit = async values => {
-    const { token, group: { id } } = this.props;
-    await this.props.submitAccounts(values, id, token);
+    await this.props.submitAccounts(values, this.props.groupId);
 
     if (this.props.stepSuccess)
       this.props.handleNext();
@@ -75,7 +74,7 @@ class ChamaAccounts extends Component {
                 <Col md={4}>
                 <Field
                   label="Contribution Amount"
-                  name={`accounts[${i}].contribution_amount`}
+                  name={`accounts[${i}].contributionAmount`}
                   id="contribution-amount"
                   component={renderFormGroup}
                   type="text"
@@ -132,14 +131,15 @@ ChamaAccounts = reduxForm({
 })(ChamaAccounts);
 
 const mapStateToProps = state => ({
+  initialValues: state.chamaAccounts.info,
   token: state.auth.accessToken,
   stepSuccess: state.chamaAccounts.stepSuccess,
-  group: state.chamaDetails.group,
+  groupId: state.chamaDetails.groupId,
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitAccounts: (values, groupId, token) => 
-    dispatch(submitChamaAccounts(values, groupId, token)),
+  submitAccounts: (values, groupId) => 
+    dispatch(submitChamaAccounts(values, groupId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChamaAccounts);

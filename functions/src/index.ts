@@ -48,6 +48,15 @@ exports.dedupGroup = functions.https.onCall(async (data: any) => {
   return null;
 });
 
+interface GroupAdmin {
+  uid: string,
+  displayName: string|undefined;
+  email: string|undefined,
+  phoneNumber: string|undefined,
+  role: string,
+  groupId?: string,
+}
+
 exports.registerGroupAndAdmin = functions.https.onCall(async (data: any) => {
   const rules = {
     chamaName: 'required|string|max:100',
@@ -62,7 +71,7 @@ exports.registerGroupAndAdmin = functions.https.onCall(async (data: any) => {
 
   let payload;
   let adminRecord: UserRecord;
-  let groupAdmin: object;
+  let groupAdmin: GroupAdmin;
 
   try {
      payload = await validateAll(data, rules);
@@ -86,7 +95,7 @@ exports.registerGroupAndAdmin = functions.https.onCall(async (data: any) => {
       email: adminRecord.email,
       displayName: adminRecord.displayName,
       phoneNumber: adminRecord.phoneNumber,
-      role: 'group-admin'
+      role: 'group-admin',
     }
   } catch(e) {
     throw new functions.https.HttpsError('internal', 'Admin Authentication Error', e);
@@ -95,6 +104,8 @@ exports.registerGroupAndAdmin = functions.https.onCall(async (data: any) => {
   try {
     const groupDocRef = await db.collection('groups')
       .add({ chamaName: payload.chamaName, noOfMembers: payload.noOfMembers });
+
+    groupAdmin.groupId = groupDocRef.id;
 
     await groupDocRef.collection('members').add(groupAdmin);
   } catch(e) {
@@ -194,6 +205,43 @@ exports.validateOTP = functions.https.onCall(async (data: any) => {
   }
 
   throw new functions.https.HttpsError('unknown', 'We did not receive any OTP. Try resending.');
+});
+
+exports.saveGroupAccounts = functions.https.onCall(async (data: any) => {
+  const rules = { accounts: 'required|array', groupId: 'required|string' };
+  let payload;
+
+  try {
+    payload = await validateAll(data, rules);
+  } catch(e) {
+    console.log(e);
+    throw new functions.https.HttpsError('invalid-argument', 'Invalid Payload', e);
+  }
+
+  const accountsRef = db.collection(`groups/${payload.groupId}/accounts`);
+
+  for(let i = 0; i < payload.accounts.length; i++) {
+    const acc = payload.accounts[i];
+    const accDetails = {...acc};
+
+    accDetails.i = i;
+    accDetails.fieldName = 'contributionAmount';
+
+    if (!acc.contributionAmount)
+      throw new functions.https.HttpsError('invalid-argument',
+        'Contribution Amount must be greater than 0', accDetails);
+
+    const accountsSnapshot = await accountsRef.where('name', '==', acc.name).get();
+    accDetails.fieldName = 'name';
+
+    // TODO: update the group info instead of throwing exception
+    if (!accountsSnapshot.empty)
+      throw new functions.https.HttpsError('already-exists', `${acc.name} account already exists.`, accDetails);
+
+    await accountsRef.add(acc);
+  }
+
+  return payload.accounts;
 });
 
 function generateOTP() {

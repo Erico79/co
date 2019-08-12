@@ -1,13 +1,15 @@
-import axios from '../../axios';
+import firebase from '../../initFirebase';
 
 const SUBMIT_CHAMA_ACCOUNTS_REQUEST = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_REQUEST';
 const SUBMIT_CHAMA_ACCOUNTS_SUCCESS = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_SUCCESS';
 const SUBMIT_CHAMA_ACCOUNTS_FAILURE = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_FAILURE';
 const SUBMIT_CHAMA_ACCOUNTS_ERROR = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_ERROR';
 
+const INVALID_ARGUMENT = 'INVALID_ARGUMENT';
+
 const initialState = {
   info: {
-    accounts: [],
+    accounts: [{}],
   },
   isLoading: false,
   stepSuccess: false,
@@ -49,16 +51,21 @@ const reducer = (state = initialState, action) => {
   }
 };
 
-export const submitChamaAccounts = (accountsInfo, group_id, token) => async dispatch => {
+export const submitChamaAccounts = (accountsInfo, groupId) => async dispatch => {
   dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_REQUEST });
 
   try {
-    const response = await axios(token).post(`/register/accounts/${group_id}`, accountsInfo);
+    const saveGroupAccounts = firebase.functions().httpsCallable('saveGroupAccounts');
+    await saveGroupAccounts({ ...accountsInfo, groupId });
 
-    dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_SUCCESS, payload: response.data });
+    dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_SUCCESS, payload: accountsInfo });
   } catch(e) {
-    if (e.response && e.response.data && e.response.data.errors)
-      dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_ERROR, payload: e.response.data.errors })
+    if (e.code && e.code === INVALID_ARGUMENT) {
+      dispatch({ 
+        type: SUBMIT_CHAMA_ACCOUNTS_ERROR, 
+        payload: e.details
+      });
+    }
 
     dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_FAILURE, payload: e });
   }

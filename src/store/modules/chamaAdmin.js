@@ -1,5 +1,7 @@
 import firebase from 'firebase';
 
+import { setGroupId } from './chamaDetails';
+
 const SUBMIT_CHAMA_ADMIN_REQUEST = "@chama-app/SUBMIT_CHAMA_ADMIN_REQUEST";
 const SUBMIT_CHAMA_ADMIN_SUCCESS = "@chama-app/SUBMIT_CHAMA_ADMIN_SUCCESS";
 const SUBMIT_CHAMA_ADMIN_FAILURE = "@chama-app/SUBMIT_CHAMA_ADMIN_FAILURE";
@@ -13,8 +15,8 @@ const initialState = {
   info: {
     firstName: "Eric",
     lastName: "Murimi",
-    email: "emurinyo@gmail.com",
-    mobilePhone: "+254712883777",
+    // email: "emurinyo@gmail.com",
+    // mobilePhone: "+254712883777",
     password: "pass123",
     confirmPassword: "pass123"
   },
@@ -99,7 +101,8 @@ export function submitChamaAdminDetails(adminDetails, chamaDetails) {
 
     try {
         const registerAdmin = firebase.functions().httpsCallable('registerGroupAndAdmin');
-        await registerAdmin({ ...adminDetails, ...chamaDetails });
+        const response = await registerAdmin({ ...adminDetails, ...chamaDetails });
+        console.log(response.data);
 
         dispatch({
           type: SUBMIT_CHAMA_ADMIN_SUCCESS,
@@ -108,6 +111,8 @@ export function submitChamaAdminDetails(adminDetails, chamaDetails) {
             message: "Chama Admin has been registered."
           }
         });
+
+        dispatch(setGroupId(response.data.groupId));
     } catch (e) {
       if (e.code && e.code === 'invalid-argument') {
         return dispatch({
@@ -124,7 +129,9 @@ export function submitChamaAdminDetails(adminDetails, chamaDetails) {
         if (e.details.code === 'auth/email-already-exists')
           inputErrors.email = [e.details.message];
 
-        if (e.details.code === 'auth/phone-number-already-exists')
+        if (e.details.code === 'auth/phone-number-already-exists' ||
+          e.details.code === 'auth/invalid-phone-number'
+        )
           inputErrors.mobilePhone = [e.details.message];
 
         return dispatch({ 
