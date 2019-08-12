@@ -7,7 +7,7 @@ import store from './store/createStore';
 
 import './index.sass';
 import App from './App';
-import * as serviceWorker from './serviceWorker';
+// import * as serviceWorker from './serviceWorker';
 
 const app = (
     <Provider store={store}>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Jumbotron, Row, Col, Button } from "reactstrap";
 
 import "./Home.sass";
@@ -14,7 +15,7 @@ const home = props => {
         <h3 className="display-6">Welcome to Chama App</h3>
         <p className="lead">The smartest way to manage your Chama.</p>
         <hr className="my-4" />
-        <p>Want to Register and move your Chama online?</p>
+        <p><Link to="/register">Register now</Link> and manage your Chama online?</p>
         <Row>
           <Col md="6" className="mb-2">
             <Button

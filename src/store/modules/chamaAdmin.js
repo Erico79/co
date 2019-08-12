@@ -1,4 +1,3 @@
-import db from "../../initFirestore";
 import firebase from 'firebase';
 
 const SUBMIT_CHAMA_ADMIN_REQUEST = "@chama-app/SUBMIT_CHAMA_ADMIN_REQUEST";
@@ -8,7 +7,7 @@ const SUBMIT_CHAMA_ADMIN_ERROR = "@chama-app/SUBMIT_CHAMA_ADMIN_ERROR";
 const ALREADY_SUBMITTED = "@chama-app/ALREADY_SUBMITTED";
 const OTP_IS_VALID = "@chama-app/OTP_IS_VALID";
 const ADMIN_ALREADY_EXISTS = "@chama-app/ADMIN_ALREADY_EXISTS";
-const ADMIN_EXISTS = "already-exists";
+// const ADMIN_EXISTS = "already-exists";
 
 const initialState = {
   info: {
