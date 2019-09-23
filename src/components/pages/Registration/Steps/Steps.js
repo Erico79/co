@@ -9,17 +9,17 @@ const steps = [
   },
   {
     id: 2,
-    name: "Chama Admin",
+    name: "Administrator",
     stepName: "Step 2",
   },
   {
     id: 3,
-    name: "Chama Accounts",
+    name: "Accounts",
     stepName: "Step 3",
   },
   {
     id: 4,
-    name: "Review Details",
+    name: "Summary",
     stepName: "Step 4",
   }
 ];

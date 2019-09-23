@@ -1,12 +1,37 @@
+@import '../../../../styles/variables'
+
 .Review
+  .headline
+    margin-bottom: 20px
+
   .review-section
     padding: 20px 150px
     border: 1px solid #eee
     border-radius: 4px
+    margin-bottom: 40px
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25)
+
+    @media only screen and (max-width: $large-device)
+      padding-left: 0
+      padding-right: 0
+
+    h3
+      margin-left: 15px
 
     .section
-      margin-bottom: 60px
-      line-height: 2.5
+      h3
+        margin-bottom: 20px
+        margin-left: 15px
+
+      .row
+        margin: 20px 0
+
+        .details
+          margin-bottom: 20px
+
+        .text-right
+          @media screen and (max-width: $mobile)
+            text-align: left !important
 
       &:last-child
         margin-bottom: 0

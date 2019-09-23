@@ -9,11 +9,32 @@ const INVALID_ARGUMENT = 'INVALID_ARGUMENT';
 
 const initialState = {
   info: {
-    accounts: [{}],
+    accounts: [
+      {
+        name: 'Savings',
+        contributionAmount: 400,
+      },
+      {
+        name: 'Account 2',
+        contributionAmount: 1400,
+      },
+      {
+        name: 'Fixed',
+        contributionAmount: 2000,
+      },
+      {
+        name: 'Account 4',
+        contributionAmount: 1400,
+      },
+      {
+        name: 'Account 5',
+        contributionAmount: 400,
+      }
+    ],
   },
   isLoading: false,
   stepSuccess: false,
-}
+};
 
 const reducer = (state = initialState, action) => {
   switch(action.type) {
@@ -21,7 +42,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: true,
-      }
+      };
     
     case SUBMIT_CHAMA_ACCOUNTS_SUCCESS:
       return {
@@ -29,7 +50,7 @@ const reducer = (state = initialState, action) => {
         isLoading: false,
         info: action.payload,
         stepSuccess: true,
-      }
+      };
 
     case SUBMIT_CHAMA_ACCOUNTS_FAILURE:
       return {
@@ -37,14 +58,14 @@ const reducer = (state = initialState, action) => {
         isLoading: false,
         errorMessage: 'Encountered an error while submitting Chama Accounts!',
         stepSuccess: false,
-      }
+      };
 
     case SUBMIT_CHAMA_ACCOUNTS_ERROR:
       return {
         ...state,
         isLoading: false,
         errors: action.payload,
-      }
+      };
     
     default:
       return state;
@@ -69,6 +90,6 @@ export const submitChamaAccounts = (accountsInfo, groupId) => async dispatch => 
 
     dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_FAILURE, payload: e });
   }
-}
+};
 
 export default reducer;

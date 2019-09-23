@@ -12,8 +12,8 @@ const initialState = {
   isLoading: false,
   errorMessage: "",
   info: {
-    // chamaName: 'Inuka Youth Group',
-    // noOfMembers: 3
+    chamaName: 'Inuka Youth Group',
+    noOfMembers: 3
   },
   stepSuccess: false,
   alreadySubmitted: false,
@@ -67,7 +67,7 @@ const chamaDetailsReducer = (state = initialState, action) => {
       return {
         ...state,
         groupId: action.payload.groupId,
-      }
+      };
 
     default:
       return state;
@@ -106,11 +106,11 @@ export const checkIfChamaExists = (chamaDetails) => async dispatch => {
       }
     });
   }
-}
+};
 
 export const setGroupId = groupId => async dispatch => {
   dispatch({ type: SET_GROUP_ID, payload: { groupId }})
-}
+};
 
 export function alreadySubmitted() {
   return dispatch => {

@@ -15,8 +15,8 @@ const initialState = {
   info: {
     firstName: "Eric",
     lastName: "Murimi",
-    // email: "emurinyo@gmail.com",
-    // mobilePhone: "+254712883777",
+    email: "emurinyo@gmail.com",
+    mobilePhone: "+254712883777",
     password: "pass123",
     confirmPassword: "pass123"
   },
@@ -87,7 +87,7 @@ const chamaAdminReducer = (state = initialState, action) => {
           ...state.info,
           mobilePhone: action.payload.mobilePhone,
         }
-      }
+      };
 
     default:
       return state;

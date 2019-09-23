@@ -7,33 +7,9 @@ import {
 } from 'reactstrap';
 
 import './Review.sass';
+import Account from "./Account/";
 
 class Review extends Component {
-  static defaultProps = {
-    chamaInfo: {
-      chamaName: 'Test Name',
-      noOfMembers: 4
-    },
-    adminInfo: {
-      firstName: "Eric",
-      lastName: "Murimi",
-      email: "emurinyo@gmail.com",
-      mobilePhone: "254712883777",
-      password: "pass123",
-      confirmPassword: "pass123"
-    },
-    accountsInfo: [
-      {
-        name: 'Account 1',
-        contribution_amount: 400,
-      },
-      {
-        name: 'Account 2',
-        contribution_amount: 1400,
-      },
-    ]
-  }
-
   redirectToLogin() {
     this.history.push('/login');
   }
@@ -51,64 +27,60 @@ class Review extends Component {
             Step <strong>4</strong> / 4
           </span>
         </h5>
-        <h6 className="text-center">Take some time and verify that all the information provided is correct before submitting it.</h6>
+        <h6 className="text-center headline">Take some time and verify that all the information provided is correct before submitting it.</h6>
 
         <div className="review-section">
-          <h3 className="text-left">Chama Details</h3>
+          <h3 className="text-left">Group & Admin Details</h3>
           <div className="section">
             <Row>
-              <Col>
-                <span className="text-muted">Chama Name</span>
-                <span className="font-weight-bold ml-2">{chamaName}</span>
+              <Col sm="6" xs="12" className="details">
+                <div className="text-muted">Chama Name</div>
+                <div className="font-weight-bold">{chamaName}</div>
               </Col>
-              <Col className="text-right">
-                <span className="text-muted">Number of Members</span>
-                <span className="font-weight-bold ml-2">{noOfMembers}</span>
+              <Col sm="6" xs="12" className="text-right details">
+                <div className="text-muted">Number of Members</div>
+                <div className="font-weight-bold">{noOfMembers}</div>
               </Col>
             </Row>
           </div>
 
-          <h3 className="text-left">Administrator Details</h3>
           <div className="section">
             <Row>
-              <Col>
-                <span className="text-muted">First Name</span>
-                <span className="font-weight-bold ml-2">{firstName}</span>
+              <Col sm="6" xs="12" className="details">
+                <div className="text-muted">First Name</div>
+                <div className="font-weight-bold">{firstName}</div>
               </Col>
-              <Col className="text-right">
-                <span className="text-muted">Last Name</span>
-                <span className="font-weight-bold ml-2">{lastName}</span>
+              <Col sm="6" xs="12" className="text-right details">
+                <div className="text-muted">Last Name</div>
+                <div className="font-weight-bold">{lastName}</div>
               </Col>
             </Row>
 
             <Row>
-              <Col>
-                <span className="text-muted">Email Address</span>
-                <span className="font-weight-bold ml-2">{email}</span>
+              <Col sm="6" xs="12" className="details">
+                <div className="text-muted">Email Address</div>
+                <div className="font-weight-bold">{email}</div>
               </Col>
-              <Col className="text-right">
-                <span className="text-muted">Mobile Phone</span>
-                <span className="font-weight-bold ml-2">{mobilePhone}</span>
+              <Col sm="6" xs="12" className="text-right details">
+                <div className="text-muted">Mobile Phone</div>
+                <div className="font-weight-bold">{mobilePhone}</div>
               </Col>
             </Row>
+        </div>
         </div>
 
-        <div className="section">
-          <h3>Chama Accounts</h3>
-          {accounts.map((acc, i) => (
+        <div className="review-section">
+          <div className="section">
+            <h3>Chama Accounts</h3>
             <Row>
-              <Col>
-                <span className="text-muted">{i+1}. Name of Account</span>
-                <span className="font-weight-bold ml-2">{acc.name}</span>
-              </Col>
-              <Col className="text-right">
-                <span className="text-muted">Contribution Amount</span>
-                <span className="font-weight-bold ml-2">{acc.contributionAmount}</span>
-              </Col>
+              {accounts.map((acc, i) => (
+                <Col md="4">
+                  <Account acc={acc} i={i} />
+                </Col>
+              ))}
             </Row>
-          ))}
+          </div>
         </div>
-      </div>
 
       <Row className="mt-3 mb-3">
         <Col md={{ size: 6 }} xs="6">
@@ -142,6 +114,6 @@ const mapStateToProps = state => ({
   chamaInfo: state.chamaDetails.info,
   adminInfo: state.chamaAdmin.info,
   accountsInfo: state.chamaAccounts.info.accounts,
-})
+});
 
 export default connect(mapStateToProps)(Review);
