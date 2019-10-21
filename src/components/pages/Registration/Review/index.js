@@ -74,7 +74,7 @@ class Review extends Component {
             <h3>Chama Accounts</h3>
             <Row>
               {accounts.map((acc, i) => (
-                <Col md="4">
+                <Col md="6" key={acc.name}>
                   <Account acc={acc} i={i} />
                 </Col>
               ))}

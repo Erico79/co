@@ -1,62 +1,65 @@
 @import '../../../../styles/variables.sass'
 .progressbar
-    counter-reset: step
-    margin: 40px auto
+  counter-reset: step
+  margin: 40px auto
+  text-align: center
+  padding-left: 0px
+  display: flex
+  align-content: space-between
+  justify-content: center
+
+  li
+    list-style-type: none
+    display: inline-block
+    position: relative
     text-align: center
-    padding-left: 0px
-    display: flex
-    align-content: space-between
-    justify-content: center
+    cursor: pointer
+    flex: 1
 
-    li
-        list-style-type: none
-        display: inline-block
-        position: relative
-        text-align: center
-        cursor: pointer
-        flex: 1
+    @media only screen and (max-width: $mobile)
+      font-size: 0.650em
 
-        @media only screen and (max-width: $mobile)
-            font-size: 0.650em
+    @media only screen and (max-width: $small-device)
+      font-size: 0.54em
 
-        @media only screen and (max-width: $small-device)
-            font-size: 0.54em
+  li:before
+    width: 30px
+    height: 30px
+    content: ''
+    counter-increment: step
+    line-height: 25px
+    border: 2px solid $primary-faded
+    display: block
+    text-align: center
+    margin: 0 auto 10px auto
+    border-radius: 50%
+    background-color: #ffffff
+    color: #ffffff
+    @media only screen and (max-width: $mobile)
+      line-height: 30px
 
-    li:before
-        width: 30px
-        height: 30px
-        content: ''
-        counter-increment: step
-        line-height: 25px
-        border: 2px solid $primary-faded
-        display: block
-        text-align: center
-        margin: 0 auto 10px auto
-        border-radius: 50%
-        background-color: #ffffff
-        color: #ffffff
-        @media only screen and (max-width: $mobile)
-            line-height: 30px 
+  li:after
+    width: 100%
+    height: 2px
+    content: ''
+    position: absolute
+    background-color: #7d7d7d
+    top: 15px
+    left: -50%
+    z-index: -1
 
-    li:after
-        width: 100%
-        height: 2px
-        content: ''
-        position: absolute
-        background-color: #7d7d7d
-        top: 15px
-        left: -50%
-        z-index: -1
+  li:first-child:after
+    content: none
 
-    li:first-child:after
-        content: none
+  li.active
+    color: $primary-light
 
-    li.active
-        color: $primary-light
+  li.active:before
+    border-color: $primary
+    background-color: $primary
 
-    li.active:before
-        border-color: $primary
-        background-color: $primary
+  li.active + li:after
+    background-color: $primary
 
-    li.active + li:after
-      background-color: $primary
+  li.disabled
+    cursor: not-allowed

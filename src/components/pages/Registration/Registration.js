@@ -28,6 +28,10 @@ export default class Registration extends Component {
     this.setState({currentStep: this.state.currentStep - 1});
   }
 
+  switchToStep = step => {
+    this.setState({ currentStep: step });
+  };
+
   switchComponents() {
     switch(this.state.currentStep) {
       case 1:
@@ -48,12 +52,12 @@ export default class Registration extends Component {
   }
 
   render() {
-
     return (
       <div className="RegistrationWizard">
         <h1 className="text-center">Register your Chama</h1>
           <Steps 
             currentStep={this.state.currentStep}
+            switchToStep={this.switchToStep}
           />
           {this.switchComponents()}
       </div>
