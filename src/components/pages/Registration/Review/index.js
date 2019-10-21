@@ -11,7 +11,7 @@ import Account from "./Account/";
 
 class Review extends Component {
   redirectToLogin() {
-    this.history.push('/login');
+    this.props.history.push('/login');
   }
 
   render() {
