@@ -12,8 +12,8 @@ const initialState = {
   isLoading: false,
   errorMessage: "",
   info: {
-    chamaName: 'Inuka Youth Group',
-    noOfMembers: 3
+    // chamaName: 'Inuka Youth Group',
+    // noOfMembers: 3
   },
   stepSuccess: false,
   alreadySubmitted: false,

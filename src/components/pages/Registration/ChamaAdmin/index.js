@@ -24,13 +24,13 @@ import "./ChamaAdmin.sass";
 class ChamaAdmin extends Component {
   static propTypes = {
     history: PropTypes.shape({ push: PropTypes.func.isRequired }).isRequired,
-  }
+  };
 
   state = {
     otpModalIsOpen: false,
     successAlertVisible: false,
     errorAlertVisible: false,
-  }
+  };
 
   componentDidMount() {
     if (this.props.chamaDetailsSuccess && !this.props.stepSuccess)
@@ -52,26 +52,26 @@ class ChamaAdmin extends Component {
 
   openOTPModal = () => {
     this.setState({ otpModalIsOpen: true });
-  }
+  };
 
   closeOtpModal = () => {
     this.setState({ otpModalIsOpen: false });
-  }
+  };
 
   onDismissSuccessAlert = () => {
     this.setState({ successAlertVisible: false });
-  }
+  };
 
   onDismissErrorAlert = () => {
     this.setState({ errorAlertVisible: false });
-  }
+  };
 
   validateOTPAndSaveAdmin = async (otp, mobilePhone) => {
     await this.props.validateOTP(otp, mobilePhone);
 
     if (this.props.otp.valid) 
       this.submitAdminInfo();
-  }
+  };
 
   submitAdminInfo = async () => {
     const values = this.props.adminDetails;
@@ -107,7 +107,7 @@ class ChamaAdmin extends Component {
 
     if (this.props.errorMessage)
       this.setState({ errorAlertVisible: true });
-  }
+  };
 
   render() {
     const { handleSubmit, handleBack, chamaDetails: { chamaName } } = this.props;

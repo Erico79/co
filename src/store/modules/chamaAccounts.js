@@ -4,32 +4,34 @@ const SUBMIT_CHAMA_ACCOUNTS_REQUEST = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_REQUEST'
 const SUBMIT_CHAMA_ACCOUNTS_SUCCESS = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_SUCCESS';
 const SUBMIT_CHAMA_ACCOUNTS_FAILURE = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_FAILURE';
 const SUBMIT_CHAMA_ACCOUNTS_ERROR = '@chama-app/SUBMIT_CHAMA_ACCOUNTS_ERROR';
+const MODIFY_ACCOUNTS = '@chama-app/MODIFY_ACCOUNTS';
 
 const INVALID_ARGUMENT = 'INVALID_ARGUMENT';
 
 const initialState = {
   info: {
     accounts: [
-      {
-        name: 'Savings',
-        contributionAmount: 400,
-      },
-      {
-        name: 'Account 2',
-        contributionAmount: 1400,
-      },
-      {
-        name: 'Fixed',
-        contributionAmount: 2000,
-      },
-      {
-        name: 'Account 4',
-        contributionAmount: 1400,
-      },
-      {
-        name: 'Account 5',
-        contributionAmount: 400,
-      }
+      {},
+      // {
+      //   name: 'Savings',
+      //   contributionAmount: 400,
+      // },
+      // {
+      //   name: 'Account 2',
+      //   contributionAmount: 1400,
+      // },
+      // {
+      //   name: 'Fixed',
+      //   contributionAmount: 2000,
+      // },
+      // {
+      //   name: 'Account 4',
+      //   contributionAmount: 1400,
+      // },
+      // {
+      //   name: 'Account 5',
+      //   contributionAmount: 400,
+      // }
     ],
   },
   isLoading: false,
@@ -38,6 +40,12 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
   switch(action.type) {
+    case MODIFY_ACCOUNTS:
+      return {
+        ...state,
+        info: action.payload
+      };
+
     case SUBMIT_CHAMA_ACCOUNTS_REQUEST:
       return {
         ...state,
@@ -90,6 +98,17 @@ export const submitChamaAccounts = (accountsInfo, groupId) => async dispatch => 
 
     dispatch({ type: SUBMIT_CHAMA_ACCOUNTS_FAILURE, payload: e });
   }
+};
+
+export const addAccount = accounts => async dispatch => {
+  accounts.push({});
+  dispatch({ type: MODIFY_ACCOUNTS, payload: { accounts }});
+};
+
+export const removeAccount = (index, accounts) => async dispatch => {
+  accounts.splice(index, 1);
+
+  dispatch({ type: MODIFY_ACCOUNTS, payload: { accounts }});
 };
 
 export default reducer;

@@ -209,7 +209,8 @@ exports.validateOTP = functions.https.onCall(async (data: any) => {
 
 exports.saveGroupAccounts = functions.https.onCall(async (data: any) => {
   const rules = { accounts: 'required|array', groupId: 'required|string' };
-  let payload;
+  let payload: { groupId: any; accounts: any[]; };
+  let argumentErrors: Array<Object> = [];
 
   try {
     payload = await validateAll(data, rules);
@@ -218,28 +219,43 @@ exports.saveGroupAccounts = functions.https.onCall(async (data: any) => {
     throw new functions.https.HttpsError('invalid-argument', 'Invalid Payload', e);
   }
 
+  if (data.accounts.length === 0)
+    throw new functions.https.HttpsError('invalid-argument', 'You must submit at least 1 account.');
+
   const accountsRef = db.collection(`groups/${payload.groupId}/accounts`);
 
-  for(let i = 0; i < payload.accounts.length; i++) {
+  // truncate collection
+  const groupAccQuerySnapshot = await accountsRef.get();
+
+  // Delete documents in a batch
+  let batch = db.batch();
+  groupAccQuerySnapshot.docs.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+  await batch.commit();
+
+  let batchTwo = db.batch();
+  for (let i = 0; i < payload.accounts.length; i++) {
     const acc = payload.accounts[i];
-    const accDetails = {...acc};
+    const accountName = acc.name.replace(/\s+/g, '-').toLowerCase();
+    const groupDocRef = accountsRef.doc(accountName);
 
-    accDetails.i = i;
-    accDetails.fieldName = 'contributionAmount';
+    if (!acc.contributionAmount) {
+      argumentErrors.push({
+        i,
+        fieldName: 'contributionAmount',
+        message: 'Contribution Amount must be greater than 0'
+      });
+      continue;
+    }
 
-    if (!acc.contributionAmount)
-      throw new functions.https.HttpsError('invalid-argument',
-        'Contribution Amount must be greater than 0', accDetails);
-
-    const accountsSnapshot = await accountsRef.where('name', '==', acc.name).get();
-    accDetails.fieldName = 'name';
-
-    // TODO: update the group info instead of throwing exception
-    if (!accountsSnapshot.empty)
-      throw new functions.https.HttpsError('already-exists', `${acc.name} account already exists.`, accDetails);
-
-    await accountsRef.add(acc);
+    batchTwo.create(groupDocRef, acc);
   }
+  await batchTwo.commit();
+
+  if (argumentErrors.length)
+    throw new functions.https.HttpsError('invalid-argument',
+        'Contribution Amount must be greater than 0', argumentErrors);
 
   return payload.accounts;
 });

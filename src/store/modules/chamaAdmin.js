@@ -15,8 +15,8 @@ const initialState = {
   info: {
     firstName: "Eric",
     lastName: "Murimi",
-    email: "emurinyo@gmail.com",
-    mobilePhone: "+254712883777",
+    // email: "emurinyo@gmail.com",
+    mobilePhone: "+254",
     password: "pass123",
     confirmPassword: "pass123"
   },

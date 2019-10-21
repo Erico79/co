@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Field, reduxForm } from 'redux-form';
+import {arrayRemove, Field, reduxForm} from 'redux-form';
 import {
   Form,
   FormGroup,
@@ -11,40 +11,42 @@ import {
 
 import './ChamaAccounts.sass';
 import renderFormGroup from '../../../ui/FormControls/renderFormGroup';
-import { required } from './validate';
-import { submitChamaAccounts } from '../../../../store/modules/chamaAccounts';
+import { required, numberGreaterThanZero } from './validate';
+import { submitChamaAccounts, addAccount, removeAccount } from '../../../../store/modules/chamaAccounts';
+import {numeric} from "../../../../utils/normalization";
 
 class ChamaAccounts extends Component {
   state = {
-    accounts: this.props.initialValues.accounts,
     maxNoOfAccounts: 5,
-  }
+  };
 
-  addAccountHandler = async () => {
-    const accounts = [...this.state.accounts];
-    accounts.push({});
+  modifyAccounts = (index, action) => {
+    const { addAccount, removeAccount, dispatch } = this.props;
+    const accounts = [...this.props.accounts];
+    const formName = 'chamaAccounts';
 
-    if (accounts.length <= this.state.maxNoOfAccounts)
-      await this.setState({ accounts });
-  }
+    switch(action) {
+      case 'add':
+        addAccount(accounts);
+        break;
 
-  removeAccountHandler = async (accIndex) => {
-    const accounts = [...this.state.accounts];
-    const leftAccounts = accounts.filter((acc, i) => i !== accIndex);
-
-    await this.setState({ accounts: leftAccounts });
-  }
+      case 'remove':
+        dispatch(arrayRemove(formName, `accounts`, index));
+        removeAccount(index, accounts);
+        break;
+    }
+  };
 
   submit = async values => {
-    await this.props.submitAccounts(values, this.props.groupId);
+    if (JSON.stringify(values) !== JSON.stringify(this.props.initialValues))
+      await this.props.submitAccounts(values, this.props.groupId);
 
     if (this.props.stepSuccess)
       this.props.handleNext();
-  }
+  };
 
   render() {
-    const { accounts } = this.state;
-    const { handleBack } = this.props;
+    const { accounts, handleBack } = this.props;
 
     return (
       <div className="ChamaAccounts">
@@ -78,16 +80,17 @@ class ChamaAccounts extends Component {
                   id="contribution-amount"
                   component={renderFormGroup}
                   type="text"
-                  validate={required}
+                  normalize={numeric}
+                  validate={[required, numberGreaterThanZero]}
                   />
                 </Col>
 
                 <Col md={4} className="add-account-section">
                   {i === 0 ? 
-                  <Button color="primary" outline block onClick={this.addAccountHandler}>
+                  <Button color="primary" outline block onClick={() => this.modifyAccounts(i, 'add')}>
                     <i className="fas fa-plus"></i> Add Account
                   </Button> :
-                  <Button color="danger" outline block onClick={() => this.removeAccountHandler(i)}>
+                  <Button color="danger" outline block onClick={() => this.modifyAccounts(i, 'remove')}>
                     <i className="fas fa-minus"></i> Remove Account
                   </Button>}
                 </Col>
@@ -127,19 +130,23 @@ class ChamaAccounts extends Component {
 }
 
 ChamaAccounts = reduxForm({
-  form: "chamaAccounts"
+  form: "chamaAccounts",
+  destroyOnUnmount: true,
 })(ChamaAccounts);
 
 const mapStateToProps = state => ({
   initialValues: state.chamaAccounts.info,
+  accounts: state.chamaAccounts.info.accounts,
   token: state.auth.accessToken,
   stepSuccess: state.chamaAccounts.stepSuccess,
   groupId: state.chamaDetails.groupId,
 });
 
 const mapDispatchToProps = dispatch => ({
-  submitAccounts: (values, groupId) => 
+  submitAccounts: (values, groupId) =>
     dispatch(submitChamaAccounts(values, groupId)),
+  addAccount: accounts => dispatch(addAccount(accounts)),
+  removeAccount: (index, accounts) => dispatch(removeAccount(index, accounts)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChamaAccounts);
